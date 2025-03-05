@@ -1,0 +1,3104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Training Game</title>
+    <style>
+
+
+        :root {
+            --primary: #5D5CDE;
+            --primary-dark: #4A49B8;
+            --primary-light: #7F7EE8;
+            --secondary: #31D0AA;
+            --success: #28a748;
+            --danger: #dc3548;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --text-dark: #333;
+            --text-light: #f8f9fa;
+            --bg-dark: #181818;
+            --bg-light: #FFFFFF;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode Settings */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: var(--bg-dark);
+                --text: var(--text-light);
+                --card-bg: #242424;
+                --border-color: #444;
+                --input-bg: #333;
+                --input-text: #f8f9fa;
+            }
+        }
+
+        /* Light Mode Settings */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: var(--bg-light);
+                --text: var(--text-dark);
+                --card-bg: #f8f9fa;
+                --border-color: #dee2e6;
+                --input-bg: #fff;
+                --input-text: #333;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+
+        .form-group-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+            margin: 5px;
+            font-size: 16px;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var (--text-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: #25c091;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--text-light);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--text-light);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-info {
+            background-color: var(--info);
+            color: var(--text-light);
+            min-width: auto;
+            padding: 6px 12px;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .btn-disabled, .btn-disabled:hover {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--input-text);
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-primary {
+            background-color: var(--primary);
+            color: var(--text-light);
+            font-size: 18px;
+        }
+
+        .badge-success {
+            background-color: var(--success);
+            color: var(--text-light);
+        }
+
+        .badge-danger {
+            background-color: var(--danger);
+            color: var(--text-light);
+        }
+
+        .badge-warning {
+            background-color: var(--warning);
+            color: var(--text-dark);
+        }
+
+        .badge-info {
+            background-color: var(--info);
+            color: var(--text-light);
+        }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-danger {
+            color: var(--danger);
+        }
+
+        .text-warning {
+            color: var(--warning);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .justify-content-center {
+            justify-content: center;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .mb-3 {
+            margin-bottom: 16px;
+        }
+
+        .mb-4 {
+            margin-bottom: 24px;
+        }
+
+        .mt-3 {
+            margin-top: 16px;
+        }
+
+        .mt-4 {
+            margin-top: 24px;
+        }
+
+        .p-3 {
+            padding: 16px;
+        }
+
+        .banner {
+            color: var(--text);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        #results-round-title {
+            color: var(--text-dark);
+            text-align: left;
+            text-shadow: none;
+            font-weight: 500;
+        }
+        
+        .results-screen .banner {
+            background-color: transparent;
+            text-align: left;
+            padding-left: 0;
+        }
+        
+        #round-title, #training-round-title, #deployment-round-title, #results-round-title {
+            color: var(--text); /* Using text color (black in light mode) */
+            font-size: 1.8rem;
+            text-align: left;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .budget-display {
+            background-color: var(--card-bg);
+            border: 2px solid var(--secondary);
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            height: 20px;
+            width: 100%;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .model-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .model-card:not(.disabled):hover, 
+        .model-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.25);
+        }
+
+        .model-card.selected {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+
+        .model-card.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .results-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .metric-box h3 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metric-box .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        #intro-screen {
+            display: block;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .d-flex {
+                flex-direction: column;
+            }
+
+            .metric-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .slider-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+
+
+        .slider {
+            width: 100%;
+            max-width: 500px;
+            height: 8px;
+            background: #ca6a6a;
+            outline: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Dark mode adjusted alerts */
+        @media (prefers-color-scheme: dark) {
+            .alert-info {
+                color: #d1ecf1;
+                background-color: #0c5460;
+                border-color: #0c5460;
+            }
+
+            .alert-success {
+                color: #d4edda;
+                background-color: #155724;
+                border-color: #155724;
+            }
+
+            .alert-warning {
+                color: #fff3cd;
+                background-color: #856404;
+                border-color: #856404;
+            }
+
+            .alert-danger {
+                color: #f8d7da;
+                background-color: #721c24;
+                border-color: #721c24;
+            }
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .gpu-count {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .gpu-display {
+            display: flex;
+            align-items: center;
+        }
+
+        .gpu-add-btn {
+            width: 26px;
+            height: 26px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gpu-add-btn:hover {
+            background-color: #218838;
+        }
+
+        .requirements-alert {
+            background-color: rgba(255, 193, 7, 0.2);
+            border: 1px solid var(--warning);
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+
+        /* For increment controls */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .quantity-input {
+            width: 80px;
+            height: 40px;
+            text-align: center;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        /* Win/Lose styling */
+        .result-banner {
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .win-banner {
+            background-color: rgba(40, 167, 69, 0.2);
+            border: 2px solid var(--success);
+        }
+
+        .lose-banner {
+            background-color: rgba(220, 53, 69, 0.2);
+            border: 2px solid var(--danger);
+        }
+
+        .tips-container {
+            background-color: rgba(93, 92, 222, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .explanation-container {
+            background-color: rgba(23, 162, 184, 0.1);
+            border: 1px solid var(--info);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .explanation-container ul, .tips-container ul, 
+        .modal-body ul, .card ul {
+            padding-left: 25px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .dataset-required {
+            margin-top: 8px;
+            padding: 5px 8px;
+            background-color: rgba(255, 193, 7, 0.1);
+            border-radius: 4px;
+            font-size: 14px;
+            border-left: 3px solid var(--warning);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .modal-btn-confirm {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            font-size: 14px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--info);
+            color: white;
+            margin-left: 6px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .info-icon:hover {
+            background-color: #138496;
+        }
+
+        /* Info tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            max-width: 90vw;
+            background-color: var(--dark);
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow-wrap: break-word;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark) transparent transparent transparent;
+        }
+        
+        /* GPU tooltip specific styling - below icon */
+        .gpu-tooltip .tooltiptext {
+            bottom: auto;
+            top: 125%;
+        }
+
+        .gpu-tooltip .tooltiptext::after {
+            bottom: 100%;
+            top: auto;
+            border-color: transparent transparent var(--dark) transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .metric-info {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--info);
+            color: white;
+            font-size: 12px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .info-tooltip-container {
+            position: absolute;
+            display: inline-block;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        
+        .matrix-cell .info-tooltip-container {
+            top: 20px;
+            right: 20px;
+        }
+        
+        .matrix-cell .tooltip .tooltiptext {
+            bottom: auto;
+            top: 125%;
+        }
+        
+        .matrix-cell .tooltip .tooltiptext::after {
+            bottom: 100%;
+            top: auto;
+            border-color: transparent transparent var(--dark) transparent;
+        }
+        
+        /* Confusion Matrix Styles */
+        .confusion-matrix {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0 30px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            width: 60%;
+        }
+        
+        .confusion-section {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .matrix-info-box {
+            flex: 1;
+            border: 1px solid var(--info);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            background-color: rgba(23, 162, 184, 0.1);
+            align-self: flex-start;
+        }
+        
+        .matrix-info-box h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: var(--info);
+        }
+        
+        .matrix-info-box p {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .confusion-matrix {
+                width: 100%;
+            }
+            
+            .confusion-section {
+                flex-direction: column;
+            }
+        }
+        
+        .matrix-labels {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+        }
+        
+        .matrix-corner {
+            padding: 10px;
+            font-weight: bold;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .matrix-col-label {
+            padding: 10px;
+            font-weight: bold;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+        
+        .matrix-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr;
+        }
+        
+        .matrix-row-label {
+            padding: 10px;
+            font-weight: bold;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1.4;
+        }
+        
+        .matrix-cell {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+        }
+        
+        .matrix-cell h3 {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .matrix-cell .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .matrix-cell.positive {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .matrix-cell.negative {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .technical-term {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--danger);
+        }
+
+        .status-indicator.available {
+            background-color: var(--success);
+        }
+
+        .action-bar {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gpu-display {
+            margin-left: auto;
+        }
+
+        .header-layout {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Updated budget position styling */
+        .budget-top-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .budget-top-display .budget-amount {
+            background-color: var(--secondary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            margin-left: 8px;
+        }
+
+        /* Float the financial summary info button to the right */
+        #financial-info-btn {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Modal for confirmations -->
+        <div id="confirm-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modal-title">Confirm Action</h3>
+                <div class="modal-body" id="modal-body">
+                    Are you sure you want to proceed with this action?
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
+                    <button id="modal-confirm" class="modal-btn modal-btn-confirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Modal -->
+        <div id="history-modal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                <h3 class="modal-title">Game History</h3>
+                <div class="modal-body" id="history-body">
+                    <p>No game history available yet.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="history-close" class="modal-btn modal-btn-cancel">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Introduction Screen -->
+        <div id="intro-screen" class="screen">
+            <div class="card">
+                <h1 class="text-center mb-4">Machine Learning Game</h1>
+                <div class="alert alert-warning">
+                    <h3>What is Diabetic Retinopathy?</h3>
+                    <p>Diabetic retinopathy is a serious eye condition that affects people with diabetes. It occurs when high blood sugar damages the blood vessels in the retina (the light-sensitive tissue at the back of the eye), causing them to leak fluid or bleed. Left untreated, it can lead to vision loss and blindness. When diabetic retinopathy is identified in its initial stages, effective interventions can be implemented to slow its progression.</p>
+                </div>
+                
+                <div class="explanation-container mb-4" style="background-color: rgba(93, 92, 222, 0.1); border: 1px solid var(--primary);">
+                    <h3>Game Overview</h3>
+                    <p>You're the director of a busy eye clinic facing increasing numbers of diabetic patients who need screening for retinopathy. Your clinic has decided to implement an AI screening system to help prioritize patients who need urgent attention from specialist clinicians. Your major objectives are:
+                    <ul>
+                        <li>Identify more patients with early-stage disease before vision loss occurs</li>
+                        <li>Reduce unnecessary specialist appointments for healthy patients</li>
+                        <li>Optimize your clinic's limited resources and budget</li>
+                    </ul>
+                    
+                    <h4 class="mt-4">Win Conditions:</h4>
+                    <ol class="mb-2" style="padding-left: 35px;">
+                        <li>Achieve at least 46 True Positives across three rounds (patients with disease who receive treatment)</li>
+                        <li>Maintain an overall detection rate of at least 75% (percentage of diseased patients correctly identified)</li>
+                    </ol>
+                </div>
+                <div class="text-center mb-4">
+                    <button id="start-btn" class="btn btn-primary">Start Game</button>
+                </div>
+                <div class="text-center" style="font-size: 0.9rem; opacity: 0.8;">
+                    Game created by Richard Lui
+                </div>
+            </div>
+        </div>
+
+        <!-- Round Start Screen -->
+        <div id="round-start-screen" class="screen">
+            <div class="header-layout">
+                <div class="top-controls">
+                    <button id="view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
+                    <button id="main-restart-btn" class="btn btn-danger btn-sm">Restart Game</button>
+                    <button id="win-conditions-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">Win Conditions</button>
+                </div>
+                <div class="budget-top-display">
+                    <span>Budget:</span> <span id="budget-display" class="budget-amount">$30,000</span>
+                </div>
+                <div class="banner">
+                    <h2 id="round-title">Round 1 of 3</h2>
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <div id="gpu-display" class="gpu-display">
+                    <span class="badge badge-primary">GPU Cards: <span id="gpu-count">0</span>
+                        <div class="tooltip gpu-tooltip" style="display: inline-block;">
+                            <span class="metric-info">i</span>
+                            <span class="tooltiptext" style="width: 250px;">
+                                <strong>GPUs</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Cost: $10,000 each</li>
+                                    <li>Required for training deep learning models</li>
+                                    <li> Larger models require more GPU cards for training</li>
+                                    <li>Reusable across training sessions</li>
+                                </ul>
+                            </span>
+                        </div>
+                    </span>
+                    <button id="buy-gpu-small-btn" class="gpu-add-btn" title="Buy GPU Card ($10,000)">+</button>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <h2>Choose Your Action</h2>
+                <p class="mb-3">What would you like to do in this round?</p>
+                <div class="d-flex justify-content-center flex-wrap">
+                    <button id="buy-gpu-btn" class="btn btn-primary mb-2">Buy GPU Card ($10,000)</button>
+                    <button id="train-model-btn" class="btn btn-secondary mb-2">Train a New Model</button>
+                    <button id="deploy-model-btn" class="btn btn-success mb-2">Deploy a Model</button>
+                </div>
+            </div>
+
+            <div id="models-history" class="card" style="display: none;">
+                <h3>Trained Models</h3>
+                <div id="models-list" class="mt-3">
+                    <!-- Models will be displayed here -->
+                    <p class="text-center">No models trained yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Screen -->
+        <div id="training-screen" class="screen">
+            <div class="header-layout">
+                <div class="top-controls">
+                    <button id="training-view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
+                    <button id="training-restart-btn" class="btn btn-danger btn-sm">Restart Game</button>
+                </div>
+                <div class="budget-top-display">
+                    <span>Budget:</span> <span id="training-budget-display" class="budget-amount">$30,000</span>
+                </div>
+                <div class="banner">
+                    <h2 id="training-round-title">Training - Round 1 of 3</h2>
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <div id="training-gpu-display" class="gpu-display">
+                    <span class="badge badge-primary" >GPU Cards: <span id="training-gpu-count">0</span>
+                        <div class="tooltip gpu-tooltip" style="display: inline-block;">
+                            <span class="metric-info">i</span>
+                            <span class="tooltiptext" style="width: 250px;">
+                                <strong>GPUs</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Cost: $10,000 each</li>
+                                    <li>Required for training larger models</li>
+                                    <li>Reusable across training sessions</li>
+                                </ul>
+                            </span>
+                        </div>
+                    </span>
+                    <button id="training-buy-gpu-btn" class="gpu-add-btn" title="Buy GPU Card ($10,000)">+</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Configure Your Model</h2>
+                
+                <div class="form-group">
+                     <h3>
+            Data Collection 
+            <div class="tooltip" style="display: inline-block;">
+                <span class="metric-info">i</span>
+                <span class="tooltiptext" style="width: 400px;">
+                    <strong>Training Data Costs</strong><br>
+                    <div class="data-row">
+                        <div class="data-section"> - <strong>Diseased Images ($100):</strong> Expensive due to specialist diagnosis requirements, rarity, and multiple expert reviews needed for accurate labeling.</div>
+                        <div class="data-section"> -<strong>Healthy Images ($10):</strong> More affordable as they're common, require less specialist time, and have simpler labeling requirements.</div>
+                    </div>
+                </span>
+            </div>
+        </h3>
+                                        
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label class="form-label">Diseased Images ($100 each):</label>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" id="diseased-minus">-</button>
+                                <input type="number" id="diseased-count" class="form-control quantity-input" value="100" min="10" step="10">
+                                <button class="quantity-btn" id="diseased-plus">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Healthy Images ($10 each):</label>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" id="healthy-minus">-</button>
+                                <input type="number" id="healthy-count" class="form-control quantity-input" value="100" min="10" step="10">
+                                <button class="quantity-btn" id="healthy-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Total Images: </strong><span id="total-images-count">200</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3>
+                        Model Size
+                        <div class="tooltip" style="display: inline-block;">
+                            <span class="metric-info">i</span>
+                            <span class="tooltiptext" style="width: 350px;">
+                                <strong>The Model Size </strong><br>
+                                <p>The size of your model affects its ability to learn complex patterns in medical images:</p>
+                                <ul style="padding-left: 20px; margin: 10px 0;">
+                                    <li><strong>Small Model:</strong> Cost-effective but limited capacity. Good for initial testing or when budget is tight. Might miss subtle disease features.</li>
+                                    <li><strong>Medium Model:</strong> A good balance between cost and performance. Capable of detecting most disease patterns with adequate training data.</li>
+                                    <li><strong>Large Model:</strong> Most powerful option for complex pattern recognition. Can detect subtle disease manifestations but requires more GPUs and training data.</li>
+                                </ul>
+                                <p>Larger models need more data to train effectively and prevent overfitting.</p>
+                            </span>
+                        </div>
+                    </h3>
+                    <div id="model-size-warning" class="requirements-alert" style="display: none;">
+                        <p>You don't have enough GPU cards for this model size.</p>
+                    </div>
+                    <div class="d-flex flex-wrap" id="model-size-container">
+                        <div class="model-card mb-2" data-size="small" data-cost="5000" data-gpus="1" data-min-images="0">
+                            <div class="status-indicator available"></div>
+                            <h4>Small Model</h4>
+                            <p>Cost: $5,000</p>
+                            <p>Required GPUs: <span class="badge badge-primary">1</span></p>
+                        </div>
+                        <div class="model-card mb-2 disabled" data-size="medium" data-cost="10000" data-gpus="2" data-min-images="300">
+                            <div class="status-indicator"></div>
+                            <h4>Medium Model</h4>
+                            <p>Cost: $10,000</p>
+                            <p>Required GPUs: <span class="badge badge-primary">2</span></p>
+                            <div class="dataset-required">Requires min. 300 total images</div>
+                        </div>
+                        <div class="model-card mb-2 disabled" data-size="large" data-cost="20000" data-gpus="4" data-min-images="600">
+                            <div class="status-indicator"></div>
+                            <h4>Large Model</h4>
+                            <p>Cost: $20,000</p>
+                            <p>Required GPUs: <span class="badge badge-primary">4</span></p>
+                            <div class="dataset-required">Requires min. 600 total images</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3>Training Parameters</h3>
+                    <div class="form-group-row">
+
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="epochs">
+                                Number of Epochs (1-100):
+                                <div class="tooltip" style="display: inline-block;">
+                                    <span class="metric-info">i</span>
+                                    <span class="tooltiptext">
+                                        <strong>What are Epochs?</strong><br>
+                                        An epoch is one complete pass through your training data. More epochs improve learning until overfitting begins. Default is 40 epochs; optimal results are often achieved around 80 epochs.
+                                    </span>
+                                </div>
+                            </label>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" id="epochs-minus">-</button>
+                                <input type="number" id="epochs" class="form-control quantity-input" value="40" min="1" max="100">
+                                <button class="quantity-btn" id="epochs-plus">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="split">
+                                Train-Test Split (%):
+                                <div class="tooltip" style="display: inline-block;">
+                                    <span class="metric-info">i</span>
+                                    <span class="tooltiptext" style="width: 320px;">
+                                        <strong>Train-Test Split Explained</strong><br>
+                                        <p>This determines how your image dataset is divided:</p>
+                                        <ul style="margin: 5px 0; padding-left: 20px;">
+                                            <li><strong>Training set:</strong> Images used to teach the model to recognize patterns</li>
+                                            <li><strong>Testing set:</strong> Images kept separate to evaluate model performance</li>
+                                        </ul>
+                                        <p class="mb-0"><strong>General guidelines:</strong></p>
+                                        <ul style="margin: 5px 0; padding-left: 20px;">
+                                            <li>70/30: Good when you have limited data</li>
+                                            <li>80/20: Standard balanced approach</li>
+                                            <li>90/10: Use when you have abundant data</li>
+                                        </ul>
+                                        <p class="mb-0">A higher training percentage can improve learning but risks overfitting if your dataset is small.</p>
+                                    </span>
+                                </div>
+                            </label>
+                            <select id="split" class="form-control">
+                                <option value="0.7">70% Training / 30% Testing</option>
+                                <option value="0.8" selected>80% Training / 20% Testing</option>
+                                <option value="0.9">90% Training / 10% Testing</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3>
+                        Cost Summary
+                        <div class="tooltip" style="display: inline-block;">
+                            <span class="metric-info">i</span>
+                            <span class="tooltiptext" style="width: 320px;">
+                                <strong>Understanding Training Costs:</strong><br>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li><strong>Data collection costs:</strong> Diseased images ($100 each) are more expensive than healthy images ($10 each) due to their rarity and the expertise needed to identify them.</li>
+                                    <li><strong>Model costs:</strong> Larger models require more computing resources (GPUs) but can learn more complex patterns from your data.</li>
+                                    <li><strong>Total cost:</strong> This amount will be deducted from your budget when you train the model.</li>
+                                </ul>
+                                Balance your spending between data quantity, data quality, and model complexity to optimize your results.
+                            </span>
+                        </div>
+                    </h3>
+                    <div class="card p-3 mb-3">
+                        <div class="mb-3">
+                            <h4 class="mb-2">Data Collection Costs:</h4>
+                            <div id="diseased-cost" class="mb-2">Diseased Images: <span>$10,000</span> (100 × $100)</div>
+                            <div id="healthy-cost" class="mb-2">Healthy Images: <span>$1,000</span> (100 × $10)</div>
+                            <div id="data-cost" class="mb-2"><strong>Total Data Cost: $11,000</strong></div>
+                            
+                            <div class="alert alert-info mb-0" style="font-size: 0.9rem;">
+                                <p><strong>Dataset Balance:</strong> <span id="balance-ratio">50% diseased / 50% healthy</span></p>
+                                <p class="mb-0">A balanced dataset (approximately 50/50) helps the model learn effectively. More diseased images improve detection of true positives but cost significantly more.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <h4 class="mb-2">Model Costs:</h4>
+                            <div id="model-cost">Model Cost: $0</div>
+                        </div>
+                        
+                        <hr>
+                        <!-- Modified Total Cost div -->
+                        <div id="total-cost" class="mt-3">
+                            <strong>Total Cost: <span id="cost-value">$11,000</span>  (Available: <span id="available-balance">$30,000</span>)</strong>
+                        </div>
+                        <div id="budget-warning" class="alert alert-danger mt-3" style="display: none;">
+                            <strong>Warning:</strong> The total cost exceeds your available budget. Please adjust your selections.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button id="training-back-btn" class="btn btn-danger">Cancel</button>
+                    <button id="train-btn" class="btn btn-primary">Train Model</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deployment Screen -->
+        <div id="deployment-screen" class="screen">
+            <div class="header-layout">
+                <div class="top-controls">
+                    <button id="deployment-view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
+                    <button id="deployment-restart-btn" class="btn btn-danger btn-sm">Restart Game</button>
+                </div>
+                <div class="budget-top-display">
+                    <span>Budget:</span> <span id="deployment-budget-display" class="budget-amount">$30,000</span>
+                </div>
+                <div class="banner">
+                    <h2 id="deployment-round-title">Deployment - Round 1 of 3</h2>
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <div id="deployment-gpu-display" class="gpu-display">
+                    <span class="badge badge-primary">GPU Cards: <span id="deployment-gpu-count">0</span>
+                        <div class="tooltip gpu-tooltip" style="display: inline-block;">
+                            <span class="metric-info">i</span>
+                            <span class="tooltiptext" style="width: 250px;">
+                                <strong>GPUs</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Cost: $10,000 each</li>
+                                    <li>Required for training larger models</li>
+                                    <li>Reusable across training sessions</li>
+                                </ul>
+                            </span>
+                        </div>
+                    </span>
+                    <button id="deployment-buy-gpu-btn" class="gpu-add-btn" title="Buy GPU Card ($10,000)">+</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Select a Model to Deploy</h2>
+                <div id="deployment-models-list" class="mt-3">
+                    <!-- Models will be displayed here -->
+                    <p class="text-center">No models available for deployment.</p>
+                </div>
+                
+                <div id="threshold-container" class="mt-4" style="display: none;">
+                    <h3>Adjust Decision Threshold</h3>
+                    <p>The decision threshold is the probability at which the model decides if a patient has a disease. <br/>
+                        <ul>
+                            <li>Thresholds closer to 1 mean the model requires a higher probability to flag a patient as diseased, making it more strict and reducing false positives.</li>
+                            <li>Thresholds closer to 0 mean the model requires a lower probability to flag a patient as diseased, making it more lenient and increasing the detection of true positives.</li>
+                        </ul>
+                    </p>
+                    <div class="slider-container">
+                        <label for="threshold-slider" class="form-label">Threshold: <span id="threshold-value">0.5</span></label>
+                        <input type="range" id="threshold-slider" class="slider" min="0.1" max="0.9" step="0.1" value="0.5">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button id="deployment-back-btn" class="btn btn-danger">Back</button>
+                    <button id="deploy-btn" class="btn btn-success">Deploy Selected Model</button>
+                </div>
+            </div>
+            
+            <div id="loading-container" class="loading-container card" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Deploying Model...</h3>
+            </div>
+
+
+
+
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <div class="header-layout">
+                <div class="top-controls">
+                    <button id="results-view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
+                    <button id="results-restart-btn" class="btn btn-danger btn-sm">Restart Game</button>
+                </div>
+                <div class="banner">
+                    <h2 id="results-round-title">Results - Round 1 of 3</h2>
+                </div>
+            </div>
+            
+            <div class="budget-top-display">
+                <span>Budget:</span> <span id="results-budget-display" class="budget-amount">$30,000</span>
+            </div>
+            
+            <div class="card">
+                <h2 class="text-center mb-4">Deployment Results</h2>
+                
+                <div class="explanation-container mb-4">
+                    <h3>AI Model Deployment Impact</h3>
+                    <p>You've just deployed your trained AI model to screen <strong>100 real patients</strong> in your clinic's diabetic retinopathy screening program.</p>
+                    </br>
+                    <p>Your model's performance summary:</p>
+                    <ul>
+                        <li><strong class="text-success"><span id="summary-tp">0</span> patients</strong> with disease were correctly identified and received treatment</li>
+                        <li><strong class="text-danger"><span id="summary-fp">0</span> healthy patients</strong> were incorrectly flagged for specialist review</li>
+                        <li><strong class="text-warning"><span id="summary-fn">0</span> patients</strong> with disease were missed by the AI</li>
+                        <li><strong class="text-info"><span id="summary-tn">0</span> healthy patients</strong> were correctly cleared without specialist intervention</li>
+                    </ul>
+                </div>
+                
+                <h3 class="mb-3">Confusion Matrix</h3>
+                
+                <div class="confusion-section">
+                    <div class="confusion-matrix">
+                        <div class="matrix-labels">
+                            <div class="matrix-corner"></div>
+                            <div class="matrix-col-label">Predicted:<br>Disease</div>
+                            <div class="matrix-col-label">Predicted:<br>Healthy</div>
+                        </div>
+                        
+                        <div class="matrix-row">
+                            <div class="matrix-row-label">Actual:<br>Disease</div>
+                            
+                            <div class="matrix-cell positive">
+                                <h3>True Positives <br><span class="technical-term">(Diseased Patients Treated)</span></h3>
+                                <div id="tp-value" class="value text-success">0</div>
+                            </div>
+                            
+                            <div class="matrix-cell negative">
+                                <h3>False Negatives <br><span class="technical-term">(Missed Disease Cases)</span></h3>
+                                <div id="fn-value" class="value text-warning">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="matrix-row">
+                            <div class="matrix-row-label">Actual:<br>Healthy</div>
+                            
+                            <div class="matrix-cell negative">
+                                <h3>False Positives <br><span class="technical-term">(Unnecessary Referrals)</span></h3>
+                                <div id="fp-value" class="value text-danger">0</div>
+                            </div>
+                            
+                            <div class="matrix-cell positive">
+                                <h3>True Negatives <br><span class="technical-term">(Correctly Cleared Patients)</span></h3>
+                                <div id="tn-value" class="value text-info">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="matrix-info-box">
+                        <h4>Understanding the Confusion Matrix</h4>
+                        <p><strong>True Positives (TP):</strong> Diseased patients correctly identified who received timely treatment, potentially preventing vision loss.</p>
+                        <p><strong>False Negatives (FN):</strong> Diseased patients missed by your model who don't receive needed treatment, which could lead to vision complications.</p>
+                        <p><strong>False Positives (FP):</strong> Healthy patients incorrectly flagged as having the disease. Each false positive costs clinician time ($300) without patient benefit.</p>
+                        <p><strong>True Negatives (TN):</strong> Healthy patients correctly identified as not having the disease, saving healthcare resources.</p>
+                    </div>
+                </div>
+                
+                <div class="metric-container mt-4">
+                    <div class="metric-box">
+                        <div class="info-tooltip-container">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext">
+                                    <strong>Disease Detection Rate (TPR):</strong> The percentage of diseased patients correctly identified by your model. Higher values mean your model is better at catching patients who need treatment. TPR = TP / (TP + FN)<br><br>
+                                    <strong>What are True Positives?</strong><br>
+                                    True Positives are patients who have the disease and were correctly identified by your AI model. These patients receive appropriate treatment that can prevent vision loss and other complications of diabetic retinopathy. Each true positive represents a successful outcome for both the patient and the healthcare system.
+                                </span>
+                            </div>
+                        </div>
+                        <h3>True Positive Rate <br><span class="technical-term">(Disease Detection Rate)</span></h3>
+                        <div id="tpr-value" class="value">0%</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="info-tooltip-container">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext">False Alarm Rate (FPR): The percentage of healthy patients incorrectly flagged by your model. Lower values mean fewer unnecessary clinical reviews. FPR = FP / (FP + TN)</span>
+                            </div>
+                        </div>
+                        <h3> False Positive Rate<br><span class="technical-term">(False Alarm Rate)</span></h3>
+                        <div id="fpr-value" class="value">0%</div>
+                    </div>
+                </div>
+
+                <div class="tips-container">
+                    <h3>Improvement Tips</h3>
+                    <div id="improvement-tips">
+                        <p>Based on your results, here are some tips to improve your model's performance:</p>
+                        <ul id="tips-list">
+                            <!-- Tips will be inserted here by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="info-tooltip-container" style="position: relative; top: 0; right: 0; margin-left: auto;">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext" style="width: 300px;">
+                
+                                        <strong>How Your Budget Is Calculated:</strong><br>
+                                        <strong>Costs:</strong> Each flagged patient (TP + FP) requires clinician review ($300/hr)<br>
+                                        <strong>Income:</strong> Each true positive (TP) generates $2000 in value through early intervention, plus $30,000 round bonus<br>
+                                        <strong>Net Impact:</strong> New Budget = Previous Budget + Income - Costs
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <div><strong>Starting Budget:</strong></div>
+                            <div id="starting-budget">$30,000</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <div><strong>Clinician Costs:</strong></div>
+                            <div id="clinician-cost">$0</div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 0.9rem; color: var(--info); margin-left: 20px;">
+                            <div>(<span id="total-flagged">0</span> flagged patients × $300 per hour)</div>
+                            <div></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <div><strong>Treatment Value:</strong></div>
+                            <div id="profit">$0</div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 0.9rem; color: var (--info); margin-left: 20px;">
+                            <div>(<span id="tp-count">0</span> treated patients × $2000 per patient)</div>
+                            <div></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <div><strong>Round Bonus:</strong></div>
+                            <div id="bonus">$30,000</div>
+                        </div>
+                        
+                        <hr class="mb-2">
+                        
+                        <div class="d-flex justify-content-between">
+                            <div><strong>New Budget:</strong></div>
+                            <div id="new-budget" class="text-success">$30,000</div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 0.9rem; color: var(--info); margin-left: 20px;">
+                            <div>($<span id="prev-budget">30,000</span> + $<span id="income-total">30,000</span> - $<span id="costs-total">0</span>)</div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center">
+                    <button id="next-round-btn" class="btn btn-primary">Continue to Next Round</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="final-screen" class="screen">
+            <div class="header-layout">
+                <div class="top-controls">
+                    <button id="final-view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
+                    <button id="final-restart-btn" class="btn btn-danger btn-sm">Restart Game</button>
+                </div>
+                <div class="budget-top-display">
+                    <span>Budget:</span> <span id="final-budget-display" class="budget-amount">$0</span>
+                </div>
+                <div class="banner">
+                    <h2>Game Complete!</h2>
+                </div>
+            </div>
+            
+            <div id="final-result-banner" class="result-banner">
+                <h2 id="final-result-text">Game Complete!</h2>
+            </div>
+            
+            <div class="card">
+                <h2 class="text-center mb-4">Final Results</h2>
+                
+                <div class="metric-container">
+                    <div class="metric-box">
+                        <div class="info-tooltip-container">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext">The total number of diseased patients who were correctly identified by your model across three rounds. Each represents a patient who received timely treatment for diabetic retinopathy.</span>
+                            </div>
+                        </div>
+                        <h3>Total Diseased Patients Treated</h3>
+                        <div id="total-tp" class="value text-success">0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="info-tooltip-container">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext">The percentage of all diseased patients correctly identified by your model. TPR = Total TP / (Total TP + Total FN). A minimum of 75% is needed for an effective screening program.</span>
+                            </div>
+                        </div>
+                        <h3>Overall True Positive Rate</h3>
+                        <div id="overall-tpr" class="value">0%</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="info-tooltip-container">
+                            <div class="tooltip">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext">Your remaining budget after all rounds. This represents the financial sustainability of your AI screening program.</span>
+                            </div>
+                        </div>
+                        <h3>Final Budget</h3>
+                        <div id="final-budget" class="value">$0</div>
+                    </div>
+                </div>
+                
+                <div id="final-explanation">
+                    <!-- Explanation will be inserted here by JavaScript -->
+                </div>
+                
+                <div class="tips-container">
+                    <h3>Key Learnings & Future Strategies</h3>
+                    <div id="final-tips">
+                        <!-- Tips will be inserted here by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <h3>Performance Summary</h3>
+                    <table class="w-100">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>TP</th>
+                                <th>FP</th>
+                                <th>FN</th>
+                                <th>TPR</th>
+                                <th>Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table">
+                            <!-- Round summaries will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-flex justify-content-center">
+                    <button id="restart-btn" class="btn btn-primary">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentRound: 1,
+            maxRounds: 3,
+            budget: 30000,
+            gpuCards: 0,
+            models: [],
+            roundResults: [],
+            selectedModelSize: null,
+            selectedModel: null,
+            thresholdValue: 0.5,
+            totalTP: 0,
+            totalFN: 0
+        };
+
+        // DOM elements
+        const screens = {
+            intro: document.getElementById('intro-screen'),
+            roundStart: document.getElementById('round-start-screen'),
+            training: document.getElementById('training-screen'),
+            deployment: document.getElementById('deployment-screen'),
+            results: document.getElementById('results-screen'),
+            final: document.getElementById('final-screen')
+        };
+
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const buyGpuBtn = document.getElementById('buy-gpu-btn');
+        const buyGpuSmallBtn = document.getElementById('buy-gpu-small-btn');
+        const trainingBuyGpuBtn = document.getElementById('training-buy-gpu-btn');
+        const deploymentBuyGpuBtn = document.getElementById('deployment-buy-gpu-btn');
+        const trainModelBtn = document.getElementById('train-model-btn');
+        const deployModelBtn = document.getElementById('deploy-model-btn');
+        const trainingBackBtn = document.getElementById('training-back-btn');
+        const trainBtn = document.getElementById('train-btn');
+        const deploymentBackBtn = document.getElementById('deployment-back-btn');
+        const deployBtn = document.getElementById('deploy-btn');
+        const nextRoundBtn = document.getElementById('next-round-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const mainRestartBtn = document.getElementById('main-restart-btn');
+        const trainingRestartBtn = document.getElementById('training-restart-btn');
+        const deploymentRestartBtn = document.getElementById('deployment-restart-btn');
+        const resultsRestartBtn = document.getElementById('results-restart-btn');
+        const finalRestartBtn = document.getElementById('final-restart-btn');
+        const winConditionsBtn = document.getElementById('win-conditions-btn');
+
+        // Modal elements
+        const modalOverlay = document.getElementById('confirm-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalConfirm = document.getElementById('modal-confirm');
+        const modalCancel = document.getElementById('modal-cancel');
+
+        // Confirmation modal
+        function showConfirmModal(title, message, onConfirm, showCancel = true) {
+            modalTitle.textContent = title;
+            modalBody.textContent = message;
+            
+            // Set up confirm action
+            modalConfirm.onclick = () => {
+                hideConfirmModal();
+                onConfirm();
+            };
+            
+            // Set up cancel action
+            modalCancel.onclick = hideConfirmModal;
+            
+            // Show/hide cancel button based on parameter
+            modalCancel.style.display = showCancel ? 'block' : 'none';
+            
+            // Show modal
+            modalOverlay.style.display = 'flex';
+        }
+
+        function hideConfirmModal() {
+            modalOverlay.style.display = 'none';
+        }
+
+        // Buy GPU function with confirmation
+        function buyGPU() {
+            if (gameState.budget >= 10000) {
+                gameState.budget -= 10000;
+                gameState.gpuCards += 1;
+                updateBudgetDisplay();
+                updateGpuDisplay();
+                updateModelAvailability();
+                checkAndUpdateTrainButton();
+            } else {
+                alert('Insufficient budget to buy a GPU card!');
+            }
+        }
+
+        // Utility functions
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => screen.style.display = 'none');
+            screens[screenId].style.display = 'block';
+        }
+
+        function updateBudgetDisplay() {
+            const budgetDisplays = [
+                document.getElementById('budget-display'),
+                document.getElementById('training-budget-display'),
+                document.getElementById('deployment-budget-display'),
+                document.getElementById('results-budget-display')
+            ];
+            
+            budgetDisplays.forEach(display => {
+                if (display) display.textContent = `$${gameState.budget.toLocaleString()}`;
+            });
+        }
+
+        function updateGpuDisplay() {
+            const gpuCounts = [
+                document.getElementById('gpu-count'),
+                document.getElementById('training-gpu-count'),
+                document.getElementById('deployment-gpu-count')
+            ];
+            
+            gpuCounts.forEach(count => {
+                if (count) count.textContent = gameState.gpuCards;
+            });
+        }
+
+        function updateRoundTitles() {
+            document.getElementById('round-title').textContent = `Round ${gameState.currentRound} of ${gameState.maxRounds}`;
+            document.getElementById('training-round-title').textContent = `Training - Round ${gameState.currentRound} of ${gameState.maxRounds}`;
+            document.getElementById('deployment-round-title').textContent = `Deployment - Round ${gameState.currentRound} of ${gameState.maxRounds}`;
+            document.getElementById('results-round-title').textContent = `Results - Round ${gameState.currentRound} of ${gameState.maxRounds}`;
+        }
+
+        function formatPercent(value) {
+            return (value * 100).toFixed(1) + '%';
+        }
+
+        function updateModelAvailability(skipCostUpdate = false) {
+            // Always get fresh values
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            const totalImages = diseasedCount + healthyCount;
+            
+            const modelCards = document.querySelectorAll('#model-size-container .model-card');
+            let anyModelAvailable = false;
+            let selectedCard = null;
+            
+            // First pass: update availability status for all cards
+            modelCards.forEach(card => {
+                const gpuRequired = parseInt(card.dataset.gpus);
+                const minImages = parseInt(card.dataset.minImages);
+                const statusIndicator = card.querySelector('.status-indicator');
+                const modelSize = card.dataset.size;
+                
+                const gpuSufficient = gameState.gpuCards >= gpuRequired;
+                const dataSufficient = totalImages >= minImages;
+                
+                if (gpuSufficient && dataSufficient) {
+                    // Make model available
+                    card.classList.remove('disabled');
+                    statusIndicator.classList.add('available');
+                    anyModelAvailable = true;
+                    
+                    // Track if this is the currently selected model
+                    if (gameState.selectedModelSize === modelSize) {
+                        selectedCard = card;
+                    }
+                } else {
+                    // Make model unavailable
+                    card.classList.add('disabled');
+                    statusIndicator.classList.remove('available');
+                    
+                    // Deselect if this was selected
+                    if (gameState.selectedModelSize === modelSize) {
+                        gameState.selectedModelSize = null;
+                    }
+                }
+            });
+            
+            // Remove selection from all cards first
+            modelCards.forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Second pass: determine which card should be selected
+            if (selectedCard) {
+                // Keep the previously selected card if it's still available
+                selectedCard.classList.add('selected');
+            } else if (anyModelAvailable) {
+                // Auto-select the first available model if none is currently selected
+                // Find the first available model (small, then medium, then large)
+                let firstAvailable = null;
+                
+                // Try to find small model first
+                firstAvailable = document.querySelector('#model-size-container .model-card[data-size="small"]:not(.disabled)');
+                
+                // If no small model, try medium
+                if (!firstAvailable) {
+                    firstAvailable = document.querySelector('#model-size-container .model-card[data-size="medium"]:not(.disabled)');
+                }
+                
+                // If no medium model, try large
+                if (!firstAvailable) {
+                    firstAvailable = document.querySelector('#model-size-container .model-card[data-size="large"]:not(.disabled)');
+                }
+                
+                if (firstAvailable) {
+                    firstAvailable.classList.add('selected');
+                    gameState.selectedModelSize = firstAvailable.dataset.size;
+                }
+            }
+            
+            // Always update the train button state
+            if (gameState.selectedModelSize) {
+                enableTrainButton();
+            } else {
+                disableTrainButton();
+            }
+            
+            // Update cost display (but prevent circular reference)
+            if (!skipCostUpdate) {
+                updateTrainingCosts(true); // Pass flag to avoid circular calls
+            }
+        }
+
+        function enableTrainButton() {
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            
+            let modelCost = 0;
+            if (gameState.selectedModelSize) {
+                const selectedModelCard = document.querySelector(`.model-card[data-size="${gameState.selectedModelSize}"]`);
+                if (selectedModelCard) {
+                    modelCost = parseInt(selectedModelCard.dataset.cost);
+                }
+            }
+            
+            const dataCost = (diseasedCount * 100) + (healthyCount * 10);
+            const totalCost = dataCost + modelCost;
+            
+            // Debug info
+            console.log("Train button check:", {
+                totalCost,
+                budget: gameState.budget,
+                selectedModelSize: gameState.selectedModelSize,
+                condition: totalCost <= gameState.budget && gameState.selectedModelSize
+            });
+            
+            // Only enable if there's enough budget
+            if (totalCost <= gameState.budget && gameState.selectedModelSize) {
+                trainBtn.classList.remove('btn-disabled');
+                trainBtn.disabled = false;
+            } else {
+                disableTrainButton();
+            }
+        }
+
+        function disableTrainButton() {
+            trainBtn.classList.add('btn-disabled');
+            trainBtn.disabled = true;
+        }
+
+        function checkAndUpdateTrainButton() {
+            // If a model is selected, check if it's still available
+            if (gameState.selectedModelSize) {
+                const selectedCard = document.querySelector(`.model-card[data-size="${gameState.selectedModelSize}"]`);
+                if (selectedCard && !selectedCard.classList.contains('disabled')) {
+                    enableTrainButton();
+                } else {
+                    // If the selected model is no longer available, find another available one
+                    const availableCards = document.querySelectorAll('#model-size-container .model-card:not(.disabled)');
+                    if (availableCards.length > 0) {
+                        // Remove selected class from all cards
+                        document.querySelectorAll('#model-size-container .model-card').forEach(c => c.classList.remove('selected'));
+                        
+                        // Select the first available card
+                        availableCards[0].classList.add('selected');
+                        gameState.selectedModelSize = availableCards[0].dataset.size;
+                        enableTrainButton();
+                    } else {
+                        gameState.selectedModelSize = null;
+                        disableTrainButton();
+                    }
+                }
+            } else {
+                // If no model is selected, see if there's an available one
+                const availableCards = document.querySelectorAll('#model-size-container .model-card:not(.disabled)');
+                if (availableCards.length > 0) {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('#model-size-container .model-card').forEach(c => c.classList.remove('selected'));
+                    
+                    // Select the first available card
+                    availableCards[0].classList.add('selected');
+                    gameState.selectedModelSize = availableCards[0].dataset.size;
+                    enableTrainButton();
+                } else {
+                    disableTrainButton();
+                }
+            }
+        }
+
+        function updateTrainingCosts(skipAvailabilityUpdate = false) {
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            const totalImages = diseasedCount + healthyCount;
+            document.getElementById('total-images-count').textContent = totalImages;
+            
+            // Calculate dataset balance
+            const diseasedPercentage = Math.round((diseasedCount / totalImages) * 100);
+            const healthyPercentage = 100 - diseasedPercentage;
+            document.getElementById('balance-ratio').textContent = `${diseasedPercentage}% diseased / ${healthyPercentage}% healthy`;
+            
+            // Update detailed costs
+            const diseasedCost = diseasedCount * 100;
+            const healthyCost = healthyCount * 10;
+            const dataCost = diseasedCost + healthyCost;
+            
+            // Update the costs in the UI
+            document.getElementById('diseased-cost').innerHTML = `Diseased Images: <span>$${diseasedCost.toLocaleString()}</span> (${diseasedCount} × $100)`;
+            document.getElementById('healthy-cost').innerHTML = `Healthy Images: <span>$${healthyCost.toLocaleString()}</span> (${healthyCount} × $10)`;
+            document.getElementById('data-cost').innerHTML = `<strong>Total Data Cost: $${dataCost.toLocaleString()}</strong>`;
+            
+            // Model cost
+            let modelCost = 0;
+            if (gameState.selectedModelSize) {
+                const selectedModelCard = document.querySelector(`.model-card[data-size="${gameState.selectedModelSize}"]`);
+                if (selectedModelCard) {
+                    modelCost = parseInt(selectedModelCard.dataset.cost);
+                }
+            }
+            
+            document.getElementById('model-cost').innerHTML = `Model Cost: $${modelCost.toLocaleString()}`;
+            
+            // Total cost
+            const totalCost = dataCost + modelCost;
+            document.getElementById('total-cost').innerHTML = `<strong>Total Cost: <span id="cost-value">$${totalCost.toLocaleString()}</span> (Available: <span id="available-balance">$${gameState.budget.toLocaleString()})</span></strong>`;
+            
+            // Show budget warning if total cost exceeds budget
+            const budgetWarning = document.getElementById('budget-warning');
+            if (totalCost > gameState.budget) {
+                budgetWarning.style.display = 'block';
+            } else {
+                budgetWarning.style.display = 'none';
+            }
+            
+            // Update model availability based on new data counts, but only if we're not already being called from updateModelAvailability
+            if (!skipAvailabilityUpdate) {
+                updateModelAvailability(true); // Pass true to skip the cost update in return
+            }
+            
+            // Check if train button should be enabled
+            checkAndUpdateTrainButton();
+        }
+
+        function updateModelsList() {
+            const modelsList = document.getElementById('models-list');
+            const modelsHistory = document.getElementById('models-history');
+            
+            if (gameState.models.length === 0) {
+                modelsList.innerHTML = '<p class="text-center">No models trained yet.</p>';
+                modelsHistory.style.display = 'none';
+                return;
+            }
+            
+            modelsHistory.style.display = 'block';
+            let html = '';
+            
+            gameState.models.forEach((model, index) => {
+                // Ensure model size is displayed correctly in the models list too
+                const modelSizeDisplay = model.size || "unknown";
+                
+                html += `
+                <div class="model-card mb-2">
+                    <h4>Model ${index + 1} (${modelSizeDisplay.charAt(0).toUpperCase() + modelSizeDisplay.slice(1)})</h4>
+                    <p>Training Data: ${model.diseasedCount} diseased, ${model.healthyCount} healthy images</p>
+                    <p>Parameters: ${model.epochs} epochs, ${model.split * 100}% train split</p>
+                    <p>Training Cost: $${model.cost.toLocaleString()}</p>
+                    <p>Performance: ${formatPercent(model.accuracy)} accuracy</p>
+                </div>
+                `;
+            });
+            
+            modelsList.innerHTML = html;
+        }
+
+        function updateDeploymentModelsList() {
+            const deploymentModelsList = document.getElementById('deployment-models-list');
+            
+            // Always disable deploy button initially when entering deployment screen
+            deployBtn.classList.add('btn-disabled');
+            deployBtn.disabled = true;
+            
+            if (gameState.models.length === 0) {
+                deploymentModelsList.innerHTML = '<p class="text-center">No models available for deployment.</p>';
+                document.getElementById('threshold-container').style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            
+            gameState.models.forEach((model, index) => {
+                // Capitalize the first letter of the model size for display
+                const modelSizeDisplay = model.size ? 
+                    model.size.charAt(0).toUpperCase() + model.size.slice(1) : 
+                    "Unknown";
+                
+                console.log(`Deployment - Model ${index+1} size:`, model.size, "Display:", modelSizeDisplay);
+                
+                html += `
+                <div class="model-card mb-2" data-index="${index}">
+                    <h4>Model ${index + 1} (${modelSizeDisplay})</h4>
+                    <p>Training Data: ${model.diseasedCount} diseased, ${model.healthyCount} healthy images</p>
+                    <p>Parameters: ${model.epochs} epochs, ${model.split * 100}% train split</p>
+                    <p>Performance: ${formatPercent(model.accuracy)} accuracy</p>
+                </div>
+                `;
+            });
+            
+            deploymentModelsList.innerHTML = html;
+            document.getElementById('threshold-container').style.display = 'block';
+            
+            // Add click event listeners to model cards
+            const modelCards = deploymentModelsList.querySelectorAll('.model-card');
+            modelCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Remove selected class from all cards
+                    modelCards.forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    card.classList.add('selected');
+                    // Update selected model in game state
+                    gameState.selectedModel = parseInt(card.dataset.index);
+                    // Enable deploy button
+                    deployBtn.classList.remove('btn-disabled');
+                    deployBtn.disabled = false;
+                });
+            });
+        }
+
+        function simulateDeployment() {
+            const model = gameState.models[gameState.selectedModel];
+            const threshold = gameState.thresholdValue;
+            
+            // Simulate 100 patients with 20% disease prevalence
+            const totalPatients = 100;
+            const diseasePrevalence = 0.2;
+            const diseasedPatients = Math.round(totalPatients * diseasePrevalence);
+            const healthyPatients = totalPatients - diseasedPatients;
+            
+            // Calculate base performance metrics
+            let baseTP = diseasedPatients * model.sensitivity;
+            let baseFP = healthyPatients * (1 - model.specificity);
+            
+            // Adjust based on threshold
+            // Higher threshold → lower TP, lower FP (more conservative)
+            // Lower threshold → higher TP, higher FP (more aggressive)
+            const thresholdFactor = 2 * (threshold - 0.5); // Range from -0.8 to 0.8
+            
+            let adjustedTP = Math.round(baseTP * (1 - Math.max(0, thresholdFactor)));
+            let adjustedFP = Math.round(baseFP * (1 - Math.max(0, -thresholdFactor)));
+            
+            // Ensure we're within bounds
+            adjustedTP = Math.min(Math.max(0, adjustedTP), diseasedPatients);
+            adjustedFP = Math.min(Math.max(0, adjustedFP), healthyPatients);
+            
+            const FN = diseasedPatients - adjustedTP;
+            const TN = healthyPatients - adjustedFP;
+            
+            // Calculate derived metrics
+            const TPR = adjustedTP / diseasedPatients;
+            const FPR = adjustedFP / healthyPatients;
+            
+            // Calculate costs and profits
+            const clinicianCost = (adjustedTP + adjustedFP) * 300; // $300 per hour per flagged case
+            const profit = adjustedTP * 2000; // $2000 per TP 
+            const bonus = 30000; // $30,000 bonus per round
+            
+            // Update game state
+            const roundResult = {
+                TP: adjustedTP,
+                FP: adjustedFP,
+                FN: FN,
+                TN: TN,
+                TPR: TPR,
+                FPR: FPR,
+                clinicianCost: clinicianCost,
+                profit: profit,
+                bonus: bonus,
+                modelIndex: gameState.selectedModel
+            };
+            
+            gameState.roundResults.push(roundResult);
+            gameState.totalTP += adjustedTP;
+            gameState.totalFN += FN;
+            
+            // Update budget
+            gameState.budget = gameState.budget - clinicianCost + profit + bonus;
+            
+            return roundResult;
+        }
+
+        function getImprovementTips(result) {
+            const tips = [];
+            const model = gameState.models[result.modelIndex];
+            
+            // High FP rate tips
+            if (result.FPR > 0.2) {
+                tips.push("Your model is flagging too many healthy patients (high false positives). Try increasing the threshold value to make the model more selective.");
+            }
+            
+            // Low TP rate tips
+            if (result.TPR < 0.7) {
+                tips.push("Your model is missing too many diseased patients (low true positives). Consider using a larger model or collecting more diseased images for training.");
+            }
+            
+            // Data imbalance tips
+            const diseaseRatio = model.diseasedCount / (model.diseasedCount + model.healthyCount);
+            if (diseaseRatio < 0.3 || diseaseRatio > 0.7) {
+                tips.push("Your training data has an imbalance between diseased and healthy images. For diabetic retinopathy, aim for a more balanced dataset with a ratio closer to 50/50.");
+            }
+            
+            // Model size tips
+            if (model.size === "small" && gameState.gpuCards >= 2) {
+                tips.push("Your model size may be too small for optimal performance. Consider training a medium or large model if you have enough GPU cards and budget.");
+            }
+            
+            // Threshold tips
+            if (gameState.thresholdValue > 0.7 && result.TPR < 0.8) {
+                tips.push("Your threshold may be set too high, causing the model to miss diseased patients. Try lowering it to increase sensitivity.");
+            } else if (gameState.thresholdValue < 0.3 && result.FPR > 0.3) {
+                tips.push("Your threshold may be set too low, causing many false positives. Try raising it to increase specificity.");
+            }
+            
+            // Epochs tips
+            if (model.epochs < 10) {
+                tips.push("Your model might be undertrained with only " + model.epochs + " epochs. Consider using more epochs (15-30) for better performance.");
+            } else if (model.epochs > 80) {
+                tips.push("Your model might be overtrained with " + model.epochs + " epochs. This can lead to poor generalization. Try reducing to 40-60 epochs.");
+            }
+            
+            // If no specific tips, give general advice
+            if (tips.length === 0) {
+                tips.push("Your model is performing reasonably well. For further improvements, try experimenting with different threshold values to find the optimal balance between catching diseased patients and minimizing false positives.");
+            }
+            
+            return tips;
+        }
+
+        function getFinalTips() {
+            const tips = [];
+            const totalResults = gameState.roundResults;
+            const overallTPR = gameState.totalTP / (gameState.totalTP + gameState.totalFN);
+            const totalFP = totalResults.reduce((sum, result) => sum + result.FP, 0);
+            const totalFN = gameState.totalFN;
+            
+            // Overall performance tips
+            if (gameState.totalTP < 46) {
+                tips.push("You didn't reach the target of 46 true positives. In a real-world scenario, this means many patients with diabetic retinopathy weren't detected and treated in time.");
+            }
+            
+            if (overallTPR < 0.75) {
+                tips.push("Your overall True Positive Rate (which measures the proportion of actual positive cases correctly identified by the test) was below the 75% target. A high true positive rate means that the AI can correctly identify a large proportion of actual positive cases (diabetic retinopathy) such that fewer cases go undiagnosed, enabling early medical intervention to prevent disease progression, reduce the risk of vision impairment, and improve patient outcomes.");
+            }
+            
+            // Budget management tips
+            if (gameState.budget < 0) {
+                tips.push("You ended with a negative budget. Cost management is crucial in healthcare AI. Consider using more cost-effective models and optimizing your threshold to reduce unnecessary clinical reviews.");
+            } else if (gameState.budget < 10000) {
+                tips.push("Your final budget was relatively low. To improve sustainability, balance investment in model quality with operational costs.");
+            }
+            
+            // Model selection tips
+            const usedLargeModel = gameState.models.some(model => model.size === "large");
+            if (!usedLargeModel && totalFN > 15) {
+                tips.push("You missed several diseased patients. Consider using a larger model in future rounds, as they typically have better sensitivity for detecting complex medical conditions.");
+            }
+            
+            // Data collection tips
+            const avgDiseasedImages = gameState.models.reduce((sum, model) => sum + model.diseasedCount, 0) / Math.max(1, gameState.models.length);
+            if (avgDiseasedImages < 150 && totalFN > 10) {
+                tips.push("Your models may have benefited from more diseased training images to better recognize the condition. Although this data is more expensive, it's crucial for model accuracy.");
+            }
+            
+            // Threshold optimization tips
+            if (totalFP > 100 && totalFN < 5) {
+                tips.push("Your approach prioritized catching all diseased patients, but resulted in many false positives. This increases costs as each flagged case requires clinician time. Try adjusting thresholds to find a better balance.");
+            } else if (totalFP < 20 && totalFN > 15) {
+                tips.push("Your approach minimized false positives but missed many diseased patients. In medical screening, this can have serious consequences for patient health. A lower threshold would have helped catch more cases.");
+            }
+            
+            // Add general learning tip
+            tips.push("Remember that in medical AI deployment, there's always a tradeoff between sensitivity (catching all cases) and specificity (reducing false alarms). The right balance depends on factors like disease severity, treatment costs, and available clinical resources.");
+            
+            return tips;
+        }
+
+        function getFinalExplanation(hasWon) {
+            const totalTP = gameState.totalTP;
+            const totalPatients = gameState.maxRounds * 100;
+            const totalDiseased = Math.round(totalPatients * 0.2);
+            const overallTPR = gameState.totalTP / (gameState.totalTP + gameState.totalFN);
+            
+            if (hasWon) {
+                return `
+                <div class="explanation-container">
+                    <h3>Understanding Your Performance</h3>
+                    <ul>
+                        <li>Your screening model identified ${totalTP} out of ${totalDiseased} diseased patients (${formatPercent(overallTPR)} detection rate).</li>
+                        <li>By maintaining a positive budget, you've demonstrated clinical and financial sustainability.</li>
+                        <li>In real-world healthcare, this translates to preserved vision for many patients.</li>
+                    </ul>
+                </div>
+                `;
+            } else {
+                return `
+                <div class="explanation-container">
+                    <h3>Understanding Your Performance</h3>
+                    <ul>
+                        <li>Your AI screening program didn't meet optimal clinic capacity.</li>
+                        <li>You detected ${totalTP} out of ${totalDiseased} diseased patients (${formatPercent(overallTPR)} detection rate).</li>
+                        <li>This could lead to untreated retinopathy cases.</li>
+                        <li>The key is balancing model quality, screening sensitivity, and cost management.</li>
+                    </ul>
+                </div>
+                `;
+            }
+        }
+
+        function displayResults(result) {
+            // Update result screen elements
+            document.getElementById('tp-value').textContent = result.TP;
+            document.getElementById('fp-value').textContent = result.FP;
+            document.getElementById('fn-value').textContent = result.FN;
+            document.getElementById('tn-value').textContent = result.TN;
+            document.getElementById('tpr-value').textContent = formatPercent(result.TPR);
+            document.getElementById('fpr-value').textContent = formatPercent(result.FPR);
+            
+            // Update the summary values in the explanation container
+            document.getElementById('summary-tp').textContent = result.TP;
+            document.getElementById('summary-fp').textContent = result.FP;
+            document.getElementById('summary-fn').textContent = result.FN;
+            document.getElementById('summary-tn').textContent = result.TN;
+            
+            // Calculate previous budget (before this round's changes)
+            const prevBudget = gameState.budget + result.clinicianCost - result.profit - result.bonus;
+            
+            // Update financial breakdown with detailed calculations
+            document.getElementById('starting-budget').textContent = `$${prevBudget.toLocaleString()}`;
+            document.getElementById('clinician-cost').textContent = `$${result.clinicianCost.toLocaleString()}`;
+            document.getElementById('total-flagged').textContent = result.TP + result.FP;
+            document.getElementById('profit').textContent = `$${result.profit.toLocaleString()}`;
+            document.getElementById('tp-count').textContent = result.TP;
+            document.getElementById('bonus').textContent = `$${result.bonus.toLocaleString()}`;
+            document.getElementById('new-budget').textContent = `$${gameState.budget.toLocaleString()}`;
+            document.getElementById('prev-budget').textContent = prevBudget.toLocaleString();
+            document.getElementById('income-total').textContent = (result.profit + result.bonus).toLocaleString();
+            document.getElementById('costs-total').textContent = result.clinicianCost.toLocaleString();
+            
+            // Also update the results budget display
+            document.getElementById('results-budget-display').textContent = `Budget: $${gameState.budget.toLocaleString()}`;
+            
+            // Get and display improvement tips
+            const tips = getImprovementTips(result);
+            const tipsList = document.getElementById('tips-list');
+            tipsList.innerHTML = '';
+            tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                tipsList.appendChild(li);
+            });
+            
+            // Update the next round button text for final round
+            if (gameState.currentRound === gameState.maxRounds) {
+                document.getElementById('next-round-btn').textContent = "Show Game Results";
+            } else {
+                document.getElementById('next-round-btn').textContent = "Continue to Next Round";
+            }
+            
+            // Show the results screen
+            showScreen('results');
+        }
+
+        function displayFinalResults() {
+            const totalTP = gameState.totalTP;
+            const overallTPR = gameState.totalTP / (gameState.totalTP + gameState.totalFN);
+            const finalBudget = gameState.budget;
+            
+            document.getElementById('total-tp').textContent = totalTP;
+            document.getElementById('overall-tpr').textContent = formatPercent(overallTPR);
+            document.getElementById('final-budget').textContent = `$${finalBudget.toLocaleString()}`;
+            
+            let summaryTableHTML = '';
+            gameState.roundResults.forEach((result, index) => {
+                summaryTableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${result.TP}</td>
+                    <td>${result.FP}</td>
+                    <td>${result.FN}</td>
+                    <td>${formatPercent(result.TPR)}</td>
+                    <td>$${result.profit.toLocaleString()}</td>
+                </tr>
+                `;
+            });
+            
+            document.getElementById('summary-table').innerHTML = summaryTableHTML;
+            
+            // Check win conditions with slightly easier requirements
+            const hasWon = 
+                totalTP >= 46 && 
+                overallTPR >= 0.75 && // Reduced from 0.85
+                finalBudget >= 0;
+            
+            const resultBanner = document.getElementById('final-result-banner');
+            const resultText = document.getElementById('final-result-text');
+            
+            if (hasWon) {
+                resultBanner.className = 'result-banner win-banner';
+                resultText.textContent = 'Congratulations! You\'ve succeeded!';
+                resultText.className = 'text-success';
+            } else {
+                resultBanner.className = 'result-banner lose-banner';
+                resultText.textContent = 'Challenge Failed! Try a different strategy.';
+                resultText.className = 'text-danger';
+            }
+            
+            // Get and display final explanation and tips
+            document.getElementById('final-explanation').innerHTML = getFinalExplanation(hasWon);
+            
+            const finalTips = getFinalTips();
+            let tipsHTML = '<ul>';
+            finalTips.forEach(tip => {
+                tipsHTML += `<li>${tip}</li>`;
+            });
+            tipsHTML += '</ul>';
+            document.getElementById('final-tips').innerHTML = tipsHTML;
+            
+            showScreen('final');
+        }
+
+        function resetGame() {
+            gameState.currentRound = 1;
+            gameState.budget = 30000;
+            gameState.gpuCards = 0;
+            gameState.models = [];
+            gameState.roundResults = [];
+            gameState.selectedModelSize = null;
+            gameState.selectedModel = null;
+            gameState.thresholdValue = 0.5;
+            gameState.totalTP = 0;
+            gameState.totalFN = 0;
+            
+            updateBudgetDisplay();
+            updateGpuDisplay();
+            updateRoundTitles();
+            updateModelsList();
+            
+            document.getElementById('threshold-slider').value = 0.5;
+            document.getElementById('threshold-value').textContent = 0.5;
+            
+            showScreen('intro');
+        }
+
+        function confirmRestart() {
+            showConfirmModal(
+                "Restart Game", 
+                "Are you sure you want to restart the game? All progress will be lost.",
+                resetGame
+            );
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', () => {
+            updateRoundTitles();
+            updateBudgetDisplay();
+            updateGpuDisplay();
+            // Don't call updateModelAvailability() here - it's only needed when on the training screen
+            showScreen('roundStart');
+        });
+
+        // GPU purchase confirmation
+        buyGpuBtn.addEventListener('click', () => {
+            if (gameState.budget >= 10000) {
+                showConfirmModal(
+                    "Purchase GPU Card",
+                    "Are you sure you want to buy a GPU card for $10,000?",
+                    buyGPU
+                );
+            } else {
+                showConfirmModal(
+                    "Insufficient Budget",
+                    "You don't have enough budget to buy a GPU card.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+            }
+        });
+
+        // Small GPU purchase buttons with confirmation
+        [buyGpuSmallBtn, trainingBuyGpuBtn, deploymentBuyGpuBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (gameState.budget >= 10000) {
+                    showConfirmModal(
+                        "Purchase GPU Card",
+                        "Are you sure you want to buy a GPU card for $10,000?",
+                        buyGPU
+                    );
+                } else {
+                    showConfirmModal(
+                        "Insufficient Budget",
+                        "You don't have enough budget to buy a GPU card.",
+                        () => {} // Empty function as we don't need any action on confirm
+                    );
+                }
+            });
+        });
+
+        // Restart buttons
+        [mainRestartBtn, trainingRestartBtn, deploymentRestartBtn, resultsRestartBtn, finalRestartBtn, restartBtn].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', confirmRestart);
+            }
+        });
+
+        trainModelBtn.addEventListener('click', () => {
+            // Reset selection and update UI
+            gameState.selectedModelSize = null;
+            
+            // Show training screen first
+            showScreen('training');
+            
+            // Then update costs and model availability after the screen is shown
+            // This ensures the DOM elements exist when we try to access them
+            setTimeout(() => {
+                updateTrainingCosts();
+            }, 100);
+        });
+
+        deployModelBtn.addEventListener('click', () => {
+            // Show deployment screen first
+            showScreen('deployment');
+            
+            // Then update deployment models list after screen is shown
+            setTimeout(() => {
+                // Update deployment models list
+                updateDeploymentModelsList();
+                
+                // Reset selection
+                gameState.selectedModel = null;
+                
+                // Reset the deployment screen UI elements
+                document.getElementById('loading-container').style.display = 'none';
+                const deploymentCards = document.querySelectorAll('#deployment-screen .card');
+                deploymentCards.forEach(card => {
+                    if (!card.id || card.id !== 'loading-container') {
+                        card.style.display = 'block';
+                    }
+                });
+            }, 100);
+        });
+
+        trainingBackBtn.addEventListener('click', () => {
+            showScreen('roundStart');
+        });
+
+        deploymentBackBtn.addEventListener('click', () => {
+            showScreen('roundStart');
+        });
+
+        // Update data counts
+        const updateTotalImages = () => {
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            const totalImages = diseasedCount + healthyCount;
+            document.getElementById('total-images-count').textContent = totalImages;
+            
+            // Update model availability based on new data counts
+            updateModelAvailability();
+        };
+
+        // Model size selection
+        document.querySelectorAll('#model-size-container .model-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Skip if card is disabled
+                if (this.classList.contains('disabled')) {
+                    return;
+                }
+                
+                console.log("Model card clicked:", this.dataset.size);
+                
+                // Remove selected class from all cards
+                document.querySelectorAll('#model-size-container .model-card').forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Update selected model in game state
+                gameState.selectedModelSize = this.dataset.size;
+                console.log("Selected model size updated to:", gameState.selectedModelSize);
+                
+                // Update costs
+                updateTrainingCosts();
+                
+                // Force enable train button directly
+                if (trainBtn) {
+                    trainBtn.classList.remove('btn-disabled');
+                    trainBtn.disabled = false;
+                    console.log("Train button enabled directly after model selection");
+                }
+            });
+        });
+
+        // Quantity controls
+        document.getElementById('diseased-plus').addEventListener('click', () => {
+            const input = document.getElementById('diseased-count');
+            input.value = parseInt(input.value) + 10;
+            // Force immediate updates of model availability
+            updateTotalImages();
+            updateModelAvailability();
+            checkAndUpdateTrainButton();
+        });
+
+        document.getElementById('diseased-minus').addEventListener('click', () => {
+            const input = document.getElementById('diseased-count');
+            if (parseInt(input.value) > 10) {
+                input.value = parseInt(input.value) - 10;
+                // Force immediate updates of model availability
+                updateTotalImages();
+                updateModelAvailability();
+                checkAndUpdateTrainButton();
+            }
+        });
+
+        document.getElementById('healthy-plus').addEventListener('click', () => {
+            const input = document.getElementById('healthy-count');
+            input.value = parseInt(input.value) + 10;
+            // Force immediate updates of model availability
+            updateTotalImages();
+            updateModelAvailability();
+            checkAndUpdateTrainButton();
+        });
+
+        document.getElementById('healthy-minus').addEventListener('click', () => {
+            const input = document.getElementById('healthy-count');
+            if (parseInt(input.value) > 10) {
+                input.value = parseInt(input.value) - 10;
+                // Force immediate updates of model availability
+                updateTotalImages();
+                updateModelAvailability();
+                checkAndUpdateTrainButton();
+            }
+        });
+
+        // Input change events
+        document.getElementById('diseased-count').addEventListener('change', () => {
+            const input = document.getElementById('diseased-count');
+            // Ensure value is a multiple of 10
+            input.value = Math.max(10, Math.round(parseInt(input.value) / 10) * 10);
+            // Force immediate updates of model availability
+            updateTotalImages();
+            updateModelAvailability();
+            checkAndUpdateTrainButton();
+        });
+
+        document.getElementById('healthy-count').addEventListener('change', () => {
+            const input = document.getElementById('healthy-count');
+            // Ensure value is a multiple of 10
+            input.value = Math.max(10, Math.round(parseInt(input.value) / 10) * 10);
+            // Force immediate updates of model availability
+            updateTotalImages();
+            updateModelAvailability();
+            checkAndUpdateTrainButton();
+        });
+
+        // Epochs controls
+        document.getElementById('epochs-plus').addEventListener('click', () => {
+            const input = document.getElementById('epochs');
+            const currentValue = parseInt(input.value);
+            input.value = Math.min(100, currentValue + 10);
+        });
+
+        document.getElementById('epochs-minus').addEventListener('click', () => {
+            const input = document.getElementById('epochs');
+            const currentValue = parseInt(input.value);
+            if (currentValue > 10) {
+                input.value = currentValue - 10;
+            } else {
+                input.value = 1;
+            }
+        });
+
+        document.getElementById('epochs').addEventListener('change', () => {
+            const input = document.getElementById('epochs');
+            input.value = Math.min(100, Math.max(1, parseInt(input.value)));
+        });
+
+        // Threshold slider
+        const thresholdSlider = document.getElementById('threshold-slider');
+        const thresholdValue = document.getElementById('threshold-value');
+        
+        thresholdSlider.addEventListener('input', () => {
+            gameState.thresholdValue = parseFloat(thresholdSlider.value);
+            thresholdValue.textContent = thresholdSlider.value;
+        });
+
+        // Train button
+        trainBtn.addEventListener('click', () => {
+            console.log("Train button clicked, selected model size:", gameState.selectedModelSize);
+            
+            if (!gameState.selectedModelSize) {
+                // Use modal instead of alert
+                showConfirmModal(
+                    "Selection Required",
+                    "Please select a model size first.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            const epochs = parseInt(document.getElementById('epochs').value);
+            const split = parseFloat(document.getElementById('split').value);
+            const modelSize = gameState.selectedModelSize;
+            
+            console.log("Training configuration:", {
+                modelSize,
+                diseasedCount,
+                healthyCount,
+                epochs,
+                split
+            });
+            
+            // Get model cost directly from the selected model card
+            const modelCard = document.querySelector(`.model-card[data-size="${modelSize}"]`);
+            if (!modelCard) {
+                console.error("Could not find model card for size:", modelSize);
+                return;
+            }
+            
+            const modelCost = parseInt(modelCard.dataset.cost);
+            
+            const dataCost = (diseasedCount * 100) + (healthyCount * 10);
+            const totalCost = dataCost + modelCost;
+            
+            console.log("Cost calculation:", {
+                modelCost,
+                dataCost,
+                totalCost,
+                currentBudget: gameState.budget
+            });
+            
+            if (totalCost > gameState.budget) {
+                // Use modal instead of alert
+                showConfirmModal(
+                    "Insufficient Budget",
+                    "You don't have enough budget for training this model.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            // Model Training calculation
+            // 
+                
+                // Enhanced model quality factors with increased medium and large model benefits
+                const sizeFactor = { small: 0.5, medium: 0.92, large: 1.0 }[modelSize];
+                
+                // Enhanced data impact - more data gives better results now
+                const dataFactor = Math.min(1.0, (diseasedCount + healthyCount) / 400);
+                
+                // Additional bonus for diseased images which are more valuable for learning
+                const diseasedBonus = Math.min(0.15, diseasedCount / 1000);
+                
+                const epochFactor = Math.min(1.0, epochs / 80) * (1 - Math.max(0, (epochs - 80) / 100)); // Peaks at 30 epochs to simulate overfitting
+                const balanceFactor = 1 - 0.3 * Math.abs(0.5 - (diseasedCount / (diseasedCount + healthyCount)));
+                
+                // Calculate base accuracy (0.6 to 0.95 range) with enhanced factors
+                baseAccuracy = 0.6 + 0.35 * sizeFactor * dataFactor * epochFactor * balanceFactor + diseasedBonus;
+                baseAccuracy = Math.min(baseAccuracy, 0.95);
+
+
+
+                // Calculate sensitivity and specificity (true positive rate and true negative rate)
+                const sensitivity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                const specificity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                 
+                // Calculate overall accuracy 
+                accuracy = 0.2 * sensitivity + 0.8 * specificity;
+                //accuracy can be at most 97%
+                
+
+                console.log("Model performance calculation:", {
+                    baseAccuracy,
+                    sizeFactor,
+                    dataFactor,
+                    epochFactor,
+                    balanceFactor,
+                    baseAccuracy,
+                    sensitivity,
+                    specificity,
+                    accuracy
+                });
+                
+                // Create new model object
+                const newModel = {
+                    size: modelSize,
+                    diseasedCount,
+                    healthyCount,
+                    epochs,
+                    split,
+                    cost: totalCost,
+                    accuracy,
+                    sensitivity,
+                    specificity
+                };
+                
+                // Add to models array
+                gameState.models.push(newModel);
+                
+                // Update budget
+                gameState.budget -= totalCost;
+                
+                // Update UI
+                updateBudgetDisplay();
+                updateModelsList();
+                
+                console.log("Model trained successfully:", newModel);
+                console.log("Updated game state:", {
+                    budget: gameState.budget,
+                    models: gameState.models.length
+                });
+                
+                // Show success message with next steps (without cancel button)
+                showConfirmModal(
+                    "Model Trained Successfully", 
+                    `Your ${modelSize} model has been trained successfully! You can now either deploy this model to screen patients or train another model.`,
+                    () => {
+                        // Return to round start screen
+                        showScreen('roundStart');
+                    },
+                    false // Don't show cancel button
+                );
+
+        });
+
+        // Deploy button
+        deployBtn.addEventListener('click', () => {
+            if (gameState.selectedModel === null) {
+                // Use modal instead of alert
+                showConfirmModal(
+                    "Selection Required",
+                    "Please select a model to deploy.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            // Show loading animation
+            document.getElementById('loading-container').style.display = 'block';
+            document.querySelector('#deployment-screen .card').style.display = 'none';
+            
+            // Simulate deployment with slight delay for user experience
+            setTimeout(() => {
+                const result = simulateDeployment();
+                displayResults(result);
+            }, 1500);
+        });
+
+        // Next round button
+        nextRoundBtn.addEventListener('click', () => {
+            gameState.currentRound++;
+            
+            if (gameState.currentRound > gameState.maxRounds) {
+                displayFinalResults();
+            } else {
+                updateRoundTitles();
+                updateBudgetDisplay();
+                showScreen('roundStart');
+            }
+        });
+
+        // View History Button functionality
+        const historyModal = document.getElementById('history-modal');
+        const historyBody = document.getElementById('history-body');
+        const historyClose = document.getElementById('history-close');
+        
+        // History view buttons
+        const historyButtons = [
+            document.getElementById('view-history-btn'),
+            document.getElementById('training-view-history-btn'),
+            document.getElementById('deployment-view-history-btn'),
+            document.getElementById('results-view-history-btn'),
+            document.getElementById('final-view-history-btn')
+        ];
+        
+        // Add event listeners to all history buttons
+        historyButtons.forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', showGameHistory);
+            }
+        });
+        
+        // Close history modal button
+        historyClose.addEventListener('click', () => {
+            historyModal.style.display = 'none';
+        });
+        
+        // Function to show game history
+        function showGameHistory() {
+            // If there's no history, show a message
+            if (gameState.models.length === 0 && gameState.roundResults.length === 0) {
+                historyBody.innerHTML = '<p>No game history available yet.</p>';
+                historyModal.style.display = 'flex';
+                return;
+            }
+            
+            let historyHtml = '';
+            
+            // Show trained models
+            if (gameState.models.length > 0) {
+                historyHtml += `<h4 style="color: var(--primary); font-size: 1.5rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px;">Trained Models</h4>`;
+                historyHtml += `<div class="mb-4">`;
+                
+                gameState.models.forEach((model, index) => {
+                    // Properly capitalize the model size
+                    const modelSizeDisplay = model.size ? 
+                        model.size.charAt(0).toUpperCase() + model.size.slice(1) : 
+                        "Unknown";
+                    
+                    console.log(`History - Model ${index+1} size:`, model.size, "Display:", modelSizeDisplay);
+                
+                    historyHtml += `
+                    <div class="card mb-2 p-3" style="border-left: 4px solid var(--primary);">
+                        <h5 style="color: var(--primary); font-size: 1.3rem;">Model ${index + 1} (${modelSizeDisplay})</h5>
+                        <p><strong>Configuration:</strong></p>
+                        <ul style="list-style-type: none; padding-left: 10px;">
+                            <li>📊 <strong>Training Data:</strong> ${model.diseasedCount} diseased, ${model.healthyCount} healthy images</li>
+                            <li>⚙️ <strong>Parameters:</strong> ${model.epochs} epochs, ${model.split * 100}% train split</li>
+                            <li>💰 <strong>Training Cost:</strong> $${model.cost.toLocaleString()}</li>
+                        </ul>
+                        <p><strong>Performance:</strong></p>
+                        <ul style="list-style-type: none; padding-left: 10px;">
+                            <li>🎯 <strong>Accuracy:</strong> ${formatPercent(model.accuracy)}</li>
+                            <li>✅ <strong>Sensitivity:</strong> ${formatPercent(model.sensitivity)}</li>
+                            <li>🛡️ <strong>Specificity:</strong> ${formatPercent(model.specificity)}</li>
+                        </ul>
+                    </div>
+                    `;
+                });
+                
+                historyHtml += `</div>`;
+            }
+            
+            // Show round results - only if there are actual deployment results
+            if (gameState.roundResults.length > 0) {
+                historyHtml += `<h4 style="color: var(--primary); font-size: 1.5rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px;">Deployment Results</h4>`;
+                historyHtml += `<div class="mb-4">`;
+                
+                gameState.roundResults.forEach((result, index) => {
+                    const model = gameState.models[result.modelIndex];
+                                      
+                    // Properly capitalize the model size for display in deployment results
+                    const deployedModelSize = model.size ? 
+                        model.size.charAt(0).toUpperCase() + model.size.slice(1) : 
+                        "Unknown";
+                    
+                    historyHtml += `
+                    <div class="card mb-2 p-3" style="border-left: 4px solid var(--primary);">
+                        <h5 style="color: var(--primary); font-size: 1.3rem;">Round ${index + 1} Results</h5>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                            <span>Model ${result.modelIndex + 1} (${deployedModelSize.charAt(0).toUpperCase() + deployedModelSize.slice(1)})</span>
+                            <span>Threshold: ${gameState.thresholdValue}</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p><strong>Clinical Impact:</strong></p>
+                            <ul style="list-style-type: none; padding-left: 10px;">
+                                <li>✅ <strong>True Positive:</strong> ${result.TP} Diseased patients correctly identified</li>
+                                <li>❌ <strong>False Negative:</strong> ${result.FN} Diseased patients missed</li>
+                                <li>⚠️ <strong>False Positive:</strong> ${result.FP} Healthy patients incorrectly flagged as diseased</li>
+                                <li>👍 <strong>True Negative:</strong> ${result.TN} Patiently Accurately Determined as Healthy</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p><strong>Performance Metrics:</strong></p>
+                            <ul style="list-style-type: none; padding-left: 10px;">
+                                <li>📈 <strong>Disease Detection Rate:</strong> ${formatPercent(result.TPR)}</li>
+                                <li>📉 <strong>False Alarm Rate:</strong> ${formatPercent(result.FPR)}</li>
+                                <li>👥 <strong>Patients Screened:</strong> 100</li>
+                                <li>🔬 <strong>Disease Prevalence:</strong> 20%</</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p><strong>Financial Impact:</strong></p>
+                            <ul style="list-style-type: none; padding-left: 10px;">
+                                <li>💰 <strong>Treatment Value:</strong> $${result.profit.toLocaleString()} (${result.TP} × $2,000)</li>
+                                <li>💸 <strong>Specialist Costs:</strong> $${result.clinicianCost.toLocaleString()} (${result.TP + result.FP} × $300)</li>
+                                <li>🏆 <strong>Round Bonus:</strong> $${result.bonus.toLocaleString()}</li>
+                                <li>📊 <strong>Net Impact:</strong> $${(result.profit + result.bonus - result.clinicianCost).toLocaleString()}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    `;
+                });
+                
+                historyHtml += `</div>`;
+            }
+            
+            // Update the history body
+            historyBody.innerHTML = historyHtml;
+            
+            // Show the modal
+            historyModal.style.display = 'flex';
+        }
+        
+        // Initialize UI elements that don't depend on game state
+        updateTrainingCosts();
+        updateTotalImages();
+
+
+        // Win Conditions Button functionality
+        winConditionsBtn.addEventListener('click', () => {
+            // Create the content element with HTML
+            const modalContent = document.createElement('div');
+            modalContent.innerHTML = `To win the game, you need to:<br><br>
+                <ul>
+                    <li>Achieve at least 46 True Positives across three rounds (patients with disease who receive treatment).</li>
+                    <li>Maintain an overall detection rate of at least 75% (percentage of diseased patients correctly identified).</li>
+                </ul>`;
+
+            // Invoke showConfirmModal with an empty string (or placeholder)
+            // so it doesn't get escaped, then append our HTML element manually.
+            showConfirmModal(
+                "Win Conditions",
+                "", // leave content empty here
+                () => {},
+                false // Don't show cancel button
+            );
+
+            // Append the created element into the modal body.
+            // Adjust the selector '.modal-body' to match your modal framework.
+            const modalBody = document.querySelector('.modal-body');
+            if(modalBody) {
+                modalBody.innerHTML = ""; // clear previous content if needed
+                modalBody.appendChild(modalContent);
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
