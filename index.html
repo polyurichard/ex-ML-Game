@@ -80,7 +80,7 @@
         }
 
         h1, h2, h3, h4, h5, h6 {
-            color: var(--text);
+            color: var (--text);
             margin-bottom: 16px;
             line-height: 1.3;
         }
@@ -1218,10 +1218,216 @@
             border-radius: var(--border-radius);
             text-align: center;
         }
+
+        /* Mobile Warning Modal Styles */
+        #mobile-warning-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-warning-content {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            max-width: 90%;
+            width: 350px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .mobile-warning-content h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .mobile-warning-icon {
+            font-size: 40px;
+            display: block;
+            margin: 10px auto;
+            color: var(--warning);
+        }
+
+        /* Improved mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .content-container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+                min-width: auto;
+            }
+
+            .d-flex {
+                flex-direction: column;
+            }
+
+            .form-group-row {
+                flex-direction: column;
+            }
+
+            .form-group-row .form-group {
+                margin: 0 0 20px 0;
+            }
+
+            /* Fix confusion matrix overflow */
+            .confusion-matrix {
+                width: 100%;
+            }
+
+            .confusion-section {
+                flex-direction: column;
+            }
+
+            .matrix-info-box {
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            /* Make matrix cell content fit better */
+            .matrix-cell {
+                padding: 15px 5px;
+                min-height: 120px;
+            }
+
+            .matrix-cell h3 {
+                font-size: 0.9rem;
+            }
+
+            .matrix-cell .value {
+                font-size: 1.5rem;
+            }
+
+            .threshold-bars {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .top-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .top-controls .btn {
+                margin: 5px;
+            }
+
+            /* Make the budget display look better on mobile */
+            .budget-top-display {
+                justify-content: center;
+                flex-wrap: wrap;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .gpu-display {
+                margin: 0;
+            }
+
+            /* Adjust history modal width */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                padding: 15px;
+            }
+            
+            /* Fix tooltip positioning on mobile */
+            .tooltip .tooltiptext {
+                width: 200px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .tooltip .tooltiptext::after {
+                left: 50%;
+            }
+
+            table.w-100 th, table.w-100 td {
+                padding: 5px;
+                font-size: 0.9em;
+            }
+
+            /* Make model cards stack properly */
+            .model-card {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            #model-size-container {
+                justify-content: center;
+            }
+
+            #model-size-container .model-card {
+                width: 100%;
+                max-width: 300px;
+                margin: 10px auto;
+            }
+        }
+        
+        /* Additional fixes for very small screens */
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .matrix-row-label, .matrix-col-label {
+                font-size: 0.75rem;
+                padding: 5px;
+            }
+            
+            .badge-primary {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Mobile Warning Modal -->
+        <div id="mobile-warning-modal">
+            <div class="mobile-warning-content">
+                <h3>For Best Experience</h3>
+                <span class="mobile-warning-icon">⚠️</span>
+                <p>This game is designed for desktop devices with larger screens.</p>
+                <p>For the best experience, we recommend playing on a desktop or laptop computer.</p>
+                <button id="mobile-warning-continue" class="btn btn-primary">Continue Anyway</button>
+            </div>
+        </div>
+
         <!-- Modal for confirmations -->
         <div id="confirm-modal" class="modal-overlay">
             <div class="modal-content">
@@ -3480,16 +3686,74 @@
                 modalBody.appendChild(modalContent);
             }
         });
+
+        // Mobile device detection function
+        function isMobileDevice() {
+            return (window.innerWidth <= 768) || 
+                   (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+        }
+
+        // Show mobile warning if on mobile device
+        function checkAndShowMobileWarning() {
+            if (isMobileDevice()) {
+                document.getElementById('mobile-warning-modal').style.display = 'flex';
+            }
+        }
+
+        // Mobile warning continue button
+        document.getElementById('mobile-warning-continue').addEventListener('click', function() {
+            document.getElementById('mobile-warning-modal').style.display = 'none';
+        });
+
+        // Call mobile check when page loads
+        document.addEventListener('DOMContentLoaded', checkAndShowMobileWarning);
+
+        // Additional mobile device check on resize
+        window.addEventListener('resize', function() {
+            // Only show the warning if it hasn't been dismissed and we're on the intro screen
+            if (screens.intro.style.display !== 'none' && document.getElementById('mobile-warning-modal').style.display === 'none') {
+                checkAndShowMobileWarning();
+            }
+        });
+
+        // Additional mobile layout fixes
+        function applyMobileLayoutFixes() {
+            if (isMobileDevice()) {
+                // Check if elements exist before manipulating them
+                const matrixCells = document.querySelectorAll('.matrix-cell');
+                if (matrixCells.length > 0) {
+                    matrixCells.forEach(cell => {
+                        // Simplify text in matrix cells for mobile
+                        const term = cell.querySelector('.technical-term');
+                        if (term) {
+                            term.style.fontSize = '0.7rem';
+                        }
+                    });
+                }
+                
+                // Ensure long table content wraps properly
+                const tableCells = document.querySelectorAll('table.w-100 td, table.w-100 th');
+                if (tableCells.length > 0) {
+                    tableCells.forEach(cell => {
+                        cell.style.wordBreak = 'break-word';
+                    });
+                }
+            }
+        }
+
+        // Extend showScreen function to apply mobile fixes
+        const originalShowScreen = showScreen;
+        showScreen = function(screenId) {
+            originalShowScreen(screenId);
+            setTimeout(applyMobileLayoutFixes, 100);
+        };
+
+        // Run on initial page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAndShowMobileWarning();
+            applyMobileLayoutFixes();
+        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
 
