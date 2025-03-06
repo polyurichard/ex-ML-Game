@@ -1054,6 +1054,129 @@
         #financial-info-btn {
             float: right;
         }
+
+        /* Threshold Preview Styles */
+        .threshold-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(23, 162, 184, 0.1);
+            border: 1px solid var(--info);
+            border-radius: var(--border-radius);
+        }
+
+        .threshold-preview h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .threshold-bars {
+            display: flex;
+            flex-direction: row;
+            margin: 15px 0;
+            gap: 20px;
+        }
+
+        .threshold-bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .threshold-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .threshold-bar {
+            height: 24px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+        }
+
+        .threshold-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .fp-fill {
+            background-color: var(--danger);
+        }
+
+        .fn-fill {
+            background-color: var(--warning);
+        }
+
+        .threshold-value-indicator {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 1.1rem;
+        }
+
+        .threshold-explanation {
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Add consistent width control for final screen */
+        .final-results-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Ensure table is properly contained */
+        table.w-100 {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        table.w-100 th, table.w-100 td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            overflow-wrap: break-word;
+        }
+
+        /* Responsive adjustments for all screens */
+        @media (max-width: 1200px) {
+            .container {
+                width: 95%;
+                max-width: 95%;
+            }
+        }
+
+        /* Fix width consistency for all content by removing the specific width class and applying container styling consistently */
+        .content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Style for disabled/inactive threshold slider and preview */
+        .threshold-container.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .threshold-container.disabled .slider {
+            background: #aaa;
+        }
+
+        .model-selection-hint {
+            display: none;
+            color: var(--info);
+            font-style: italic;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(23, 162, 184, 0.1);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -1433,14 +1556,18 @@
                 </div>
             </div>
             
-            <div class="card">
+            <div class="card content-container">
                 <h2>Select a Model to Deploy</h2>
                 <div id="deployment-models-list" class="mt-3">
                     <!-- Models will be displayed here -->
                     <p class="text-center">No models available for deployment.</p>
                 </div>
                 
-                <div id="threshold-container" class="mt-4" style="display: none;">
+                <div id="threshold-container" class="mt-4 threshold-container disabled">
+                    <div id="model-selection-hint" class="model-selection-hint">
+                        Please select a model to enable threshold adjustment
+                    </div>
+                    
                     <h3>Adjust Decision Threshold</h3>
                     <p>The decision threshold is the probability at which the model decides if a patient has a disease. <br/>
                         <ul>
@@ -1450,13 +1577,56 @@
                     </p>
                     <div class="slider-container">
                         <label for="threshold-slider" class="form-label">Threshold: <span id="threshold-value">0.5</span></label>
-                        <input type="range" id="threshold-slider" class="slider" min="0.1" max="0.9" step="0.1" value="0.5">
+                        <input type="range" id="threshold-slider" class="slider" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+
+                    <!-- Threshold Preview Section -->
+                    <div class="threshold-preview">
+                        <h4>Expected Impact
+                            <div class="tooltip" style="display: inline-block;">
+                                <span class="metric-info">i</span>
+                                <span class="tooltiptext" style="width: 320px;">
+                                    <strong>Understanding the Tradeoff:</strong><br>
+                                    <p>This preview shows how your threshold setting impacts the model's behavior:</p>
+                                    <ul style="margin: 5px 0; padding-left: 20px;">
+                                        <li><strong>False Positives:</strong> Healthy patients incorrectly flagged as diseased. Each costs your clinic $300 for an unnecessary specialist review.</li>
+                                        <li><strong>False Negatives:</strong> Patients with disease that the AI misses. These patients won't receive treatment, which could lead to vision complications.</li>
+                                    </ul>
+                                    <p>Finding the right balance is crucial for both patient care and clinic resource management!</p>
+                                </span>
+                            </div>
+                        </h4>
+                        <div class="threshold-bars">
+                            <div class="threshold-bar-container">
+                                <div class="threshold-bar-label">
+                                    <span>False Positives</span>
+                                    <span>(Unnecessary Referrals)</span>
+                                </div>
+                                <div class="threshold-bar">
+                                    <div id="fp-bar" class="threshold-bar-fill fp-fill" style="width: 50%;"></div>
+                                </div>
+                                <div id="fp-value-display" class="threshold-value-indicator">20%</div>
+                            </div>
+                            <div class="threshold-bar-container">
+                                <div class="threshold-bar-label">
+                                    <span>False Negatives</span>
+                                    <span>(Missed Diseases)</span>
+                                </div>
+                                <div class="threshold-bar">
+                                    <div id="fn-bar" class="threshold-bar-fill fn-fill" style="width: 50%;"></div>
+                                </div>
+                                <div id="fn-value-display" class="threshold-value-indicator">10%</div>
+                            </div>
+                        </div>
+                        <div class="threshold-explanation">
+                            <p>As you adjust the threshold, you'll see how it affects potential misdiagnoses. A <strong>higher threshold</strong> reduces unnecessary referrals but might miss more cases of disease. A <strong>lower threshold</strong> catches more disease cases but increases unnecessary specialist referrals.</p>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">
                     <button id="deployment-back-btn" class="btn btn-danger">Back</button>
-                    <button id="deploy-btn" class="btn btn-success">Deploy Selected Model</button>
+                    <button id="deploy-btn" class="btn btn-success btn-disabled" disabled>Deploy Selected Model</button>
                 </div>
             </div>
             
@@ -1464,10 +1634,6 @@
                 <div class="spinner"></div>
                 <h3>Deploying Model...</h3>
             </div>
-
-
-
-
         </div>
 
         <!-- Results Screen -->
@@ -1669,7 +1835,7 @@
                 <h2 id="final-result-text">Game Complete!</h2>
             </div>
             
-            <div class="card">
+            <div class="card content-container">
                 <h2 class="text-center mb-4">Final Results</h2>
                 
                 <div class="metric-container">
@@ -1718,21 +1884,23 @@
                 
                 <div class="card mb-4">
                     <h3>Performance Summary</h3>
-                    <table class="w-100">
-                        <thead>
-                            <tr>
-                                <th>Round</th>
-                                <th>TP</th>
-                                <th>FP</th>
-                                <th>FN</th>
-                                <th>TPR</th>
-                                <th>Profit</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summary-table">
-                            <!-- Round summaries will be inserted here -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="w-100">
+                            <thead>
+                                <tr>
+                                    <th>Round</th>
+                                    <th>TP</th>
+                                    <th>FP</th>
+                                    <th>FN</th>
+                                    <th>TPR</th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summary-table">
+                                <!-- Round summaries will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
                 <div class="d-flex justify-content-center">
@@ -1839,6 +2007,12 @@
         function showScreen(screenId) {
             Object.values(screens).forEach(screen => screen.style.display = 'none');
             screens[screenId].style.display = 'block';
+            
+            // Apply consistent width to all cards in each screen
+            const mainCards = screens[screenId].querySelectorAll('.card:not(.final-results-content):not(.content-container)');
+            mainCards.forEach(card => {
+                card.classList.add('content-container');
+            });
         }
 
         function updateBudgetDisplay() {
@@ -2127,16 +2301,23 @@
 
         function updateDeploymentModelsList() {
             const deploymentModelsList = document.getElementById('deployment-models-list');
+            const thresholdContainer = document.getElementById('threshold-container');
+            const modelSelectionHint = document.getElementById('model-selection-hint');
             
-            // Always disable deploy button initially when entering deployment screen
+            // Always disable deploy button and threshold initially when entering deployment screen
             deployBtn.classList.add('btn-disabled');
             deployBtn.disabled = true;
+            thresholdContainer.classList.add('disabled');
             
             if (gameState.models.length === 0) {
                 deploymentModelsList.innerHTML = '<p class="text-center">No models available for deployment.</p>';
-                document.getElementById('threshold-container').style.display = 'none';
+                thresholdContainer.style.display = 'none';
                 return;
             }
+            
+            // Show the threshold container but keep it disabled until a model is selected
+            thresholdContainer.style.display = 'block';
+            modelSelectionHint.style.display = 'block';
             
             let html = '';
             
@@ -2159,7 +2340,6 @@
             });
             
             deploymentModelsList.innerHTML = html;
-            document.getElementById('threshold-container').style.display = 'block';
             
             // Add click event listeners to model cards
             const modelCards = deploymentModelsList.querySelectorAll('.model-card');
@@ -2171,9 +2351,18 @@
                     card.classList.add('selected');
                     // Update selected model in game state
                     gameState.selectedModel = parseInt(card.dataset.index);
+                    console.log("Selected model for deployment:", gameState.selectedModel);
+                    
                     // Enable deploy button
                     deployBtn.classList.remove('btn-disabled');
                     deployBtn.disabled = false;
+                    
+                    // Enable threshold container
+                    thresholdContainer.classList.remove('disabled');
+                    modelSelectionHint.style.display = 'none';
+                    
+                    // Update threshold preview based on selected model
+                    updateThresholdPreview();
                 });
             });
         }
@@ -2563,6 +2752,8 @@
         });
 
         trainModelBtn.addEventListener('click', () => {
+            console.log("Train model button clicked"); // Add debug log
+            
             // Reset selection and update UI
             gameState.selectedModelSize = null;
             
@@ -2572,8 +2763,199 @@
             // Then update costs and model availability after the screen is shown
             // This ensures the DOM elements exist when we try to access them
             setTimeout(() => {
-                updateTrainingCosts();
+                try {
+                    console.log("Updating training costs"); // Add debug log
+                    updateTrainingCosts();
+                    
+                    // Make sure model cards are properly set up
+                    document.querySelectorAll('#model-size-container .model-card').forEach(card => {
+                        if (!card.classList.contains('disabled')) {
+                            console.log("Setting up click handler for model card:", card.dataset.size);
+                            
+                            // Ensure click handlers are properly bound
+                            card.onclick = function() {
+                                if (!this.classList.contains('disabled')) {
+                                    console.log("Model card clicked:", this.dataset.size);
+                                    
+                                    // Remove selected class from all cards
+                                    document.querySelectorAll('#model-size-container .model-card').forEach(c => 
+                                        c.classList.remove('selected'));
+                                    
+                                    // Add selected class to clicked card
+                                    this.classList.add('selected');
+                                    
+                                    // Update selected model in game state
+                                    gameState.selectedModelSize = this.dataset.size;
+                                    console.log("Selected model size updated to:", gameState.selectedModelSize);
+                                    
+                                    // Update costs
+                                    updateTrainingCosts();
+                                    
+                                    // Make sure train button is enabled
+                                    enableTrainButton();
+                                }
+                            };
+                        }
+                    });
+                    
+                    // Default select the first available model card if possible
+                    const firstAvailableModel = document.querySelector('#model-size-container .model-card:not(.disabled)');
+                    if (firstAvailableModel) {
+                        console.log("Auto-selecting first available model:", firstAvailableModel.dataset.size);
+                        firstAvailableModel.click();
+                    }
+                    
+                } catch (err) {
+                    console.error("Error in training screen initialization:", err);
+                }
             }, 100);
+        });
+
+        // Train button
+        trainBtn.addEventListener('click', () => {
+            console.log("Train button clicked, selected model size:", gameState.selectedModelSize);
+            
+            if (!gameState.selectedModelSize) {
+                // Use modal instead of alert
+                showConfirmModal(
+                    "Selection Required",
+                    "Please select a model size first.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
+            const healthyCount = parseInt(document.getElementById('healthy-count').value);
+            const epochs = parseInt(document.getElementById('epochs').value);
+            const split = parseFloat(document.getElementById('split').value);
+            const modelSize = gameState.selectedModelSize;
+            
+            console.log("Training configuration:", {
+                modelSize,
+                diseasedCount,
+                healthyCount,
+                epochs,
+                split
+            });
+            
+            // Get model cost directly from the selected model card
+            const modelCard = document.querySelector(`.model-card[data-size="${modelSize}"]`);
+            if (!modelCard) {
+                console.error("Could not find model card for size:", modelSize);
+                showConfirmModal(
+                    "Error",
+                    "There was a problem with your model selection. Please try again.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            const modelCost = parseInt(modelCard.dataset.cost);
+            
+            const dataCost = (diseasedCount * 100) + (healthyCount * 10);
+            const totalCost = dataCost + modelCost;
+            
+            console.log("Cost calculation:", {
+                modelCost,
+                dataCost,
+                totalCost,
+                currentBudget: gameState.budget
+            });
+            
+            if (totalCost > gameState.budget) {
+                // Use modal instead of alert
+                showConfirmModal(
+                    "Insufficient Budget",
+                    "You don't have enough budget for training this model.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+                return;
+            }
+            
+            try {
+                // Model Training calculation
+                // Enhanced model quality factors with increased medium and large model benefits
+                const sizeFactor = { small: 0.5, medium: 0.92, large: 1.0 }[modelSize];
+                
+                // Enhanced data impact - more data gives better results now
+                const dataFactor = Math.min(1.0, (diseasedCount + healthyCount) / 400);
+                
+                // Additional bonus for diseased images which are more valuable for learning
+                const diseasedBonus = Math.min(0.15, diseasedCount / 1000);
+                
+                const epochFactor = Math.min(1.0, epochs / 80) * (1 - Math.max(0, (epochs - 80) / 100)); // Peaks at 30 epochs to simulate overfitting
+                const balanceFactor = 1 - 0.3 * Math.abs(0.5 - (diseasedCount / (diseasedCount + healthyCount)));
+                
+                // Calculate base accuracy (0.6 to 0.95 range) with enhanced factors
+                let baseAccuracy = 0.6 + 0.35 * sizeFactor * dataFactor * epochFactor * balanceFactor + diseasedBonus;
+                baseAccuracy = Math.min(baseAccuracy, 0.95);
+
+                // Calculate sensitivity and specificity (true positive rate and true negative rate)
+                const sensitivity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                const specificity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                 
+                // Calculate overall accuracy 
+                const accuracy = 0.2 * sensitivity + 0.8 * specificity;
+                
+                console.log("Model performance calculation:", {
+                    baseAccuracy,
+                    sizeFactor,
+                    dataFactor,
+                    epochFactor,
+                    balanceFactor,
+                    sensitivity,
+                    specificity,
+                    accuracy
+                });
+                
+                // Create new model object
+                const newModel = {
+                    size: modelSize,
+                    diseasedCount,
+                    healthyCount,
+                    epochs,
+                    split,
+                    cost: totalCost,
+                    accuracy,
+                    sensitivity,
+                    specificity
+                };
+                
+                // Add to models array
+                gameState.models.push(newModel);
+                
+                // Update budget
+                gameState.budget -= totalCost;
+                
+                // Update UI
+                updateBudgetDisplay();
+                updateModelsList();
+                
+                console.log("Model trained successfully:", newModel);
+                console.log("Updated game state:", {
+                    budget: gameState.budget,
+                    models: gameState.models.length
+                });
+                
+                // Show success message with next steps (without cancel button)
+                showConfirmModal(
+                    "Model Trained Successfully", 
+                    `Your ${modelSize} model has been trained successfully! You can now either deploy this model to screen patients or train another model.`,
+                    () => {
+                        // Return to round start screen
+                        showScreen('roundStart');
+                    },
+                    false // Don't show cancel button
+                );
+            } catch (err) {
+                console.error("Error during model training:", err);
+                showConfirmModal(
+                    "Training Error",
+                    "An error occurred while training the model. Please try again.",
+                    () => {} // Empty function as we don't need any action on confirm
+                );
+            }
         });
 
         deployModelBtn.addEventListener('click', () => {
@@ -2587,6 +2969,18 @@
                 
                 // Reset selection
                 gameState.selectedModel = null;
+                
+                // Reset the threshold value to the default
+                gameState.thresholdValue = 0.5;
+                thresholdSlider.value = 0.5;
+                thresholdValue.textContent = "0.5";
+                
+                // Make sure threshold container is disabled until a model is selected
+                document.getElementById('threshold-container').classList.add('disabled');
+                document.getElementById('model-selection-hint').style.display = 'block';
+                
+                // Initialize the threshold preview with default values
+                updateThresholdPreview();
                 
                 // Reset the deployment screen UI elements
                 document.getElementById('loading-container').style.display = 'none';
@@ -2738,151 +3132,99 @@
         const thresholdSlider = document.getElementById('threshold-slider');
         const thresholdValue = document.getElementById('threshold-value');
         
-        thresholdSlider.addEventListener('input', () => {
-            gameState.thresholdValue = parseFloat(thresholdSlider.value);
-            thresholdValue.textContent = thresholdSlider.value;
+        thresholdSlider.addEventListener('input', function() {
+            console.log("Threshold slider moved to:", this.value);
+            gameState.thresholdValue = parseFloat(this.value);
+            thresholdValue.textContent = this.value;
+            
+            // Always update threshold preview, even if no model is selected
+            updateThresholdPreview();
         });
 
-        // Train button
-        trainBtn.addEventListener('click', () => {
-            console.log("Train button clicked, selected model size:", gameState.selectedModelSize);
+        // Function to update the threshold preview
+        function updateThresholdPreview() {
+            console.log("Updating threshold preview, selected model:", gameState.selectedModel);
             
-            if (!gameState.selectedModelSize) {
-                // Use modal instead of alert
-                showConfirmModal(
-                    "Selection Required",
-                    "Please select a model size first.",
-                    () => {} // Empty function as we don't need any action on confirm
-                );
-                return;
-            }
+            // Get references to the elements
+            const fpBar = document.getElementById('fp-bar');
+            const fnBar = document.getElementById('fn-bar');
+            const fpValueDisplay = document.getElementById('fp-value-display');
+            const fnValueDisplay = document.getElementById('fn-value-display');
             
-            const diseasedCount = parseInt(document.getElementById('diseased-count').value);
-            const healthyCount = parseInt(document.getElementById('healthy-count').value);
-            const epochs = parseInt(document.getElementById('epochs').value);
-            const split = parseFloat(document.getElementById('split').value);
-            const modelSize = gameState.selectedModelSize;
+            // Default values in case no model is selected
+            let fpPercent = 20;
+            let fnPercent = 10;
             
-            console.log("Training configuration:", {
-                modelSize,
-                diseasedCount,
-                healthyCount,
-                epochs,
-                split
-            });
-            
-            // Get model cost directly from the selected model card
-            const modelCard = document.querySelector(`.model-card[data-size="${modelSize}"]`);
-            if (!modelCard) {
-                console.error("Could not find model card for size:", modelSize);
-                return;
-            }
-            
-            const modelCost = parseInt(modelCard.dataset.cost);
-            
-            const dataCost = (diseasedCount * 100) + (healthyCount * 10);
-            const totalCost = dataCost + modelCost;
-            
-            console.log("Cost calculation:", {
-                modelCost,
-                dataCost,
-                totalCost,
-                currentBudget: gameState.budget
-            });
-            
-            if (totalCost > gameState.budget) {
-                // Use modal instead of alert
-                showConfirmModal(
-                    "Insufficient Budget",
-                    "You don't have enough budget for training this model.",
-                    () => {} // Empty function as we don't need any action on confirm
-                );
-                return;
-            }
-            
-            // Model Training calculation
-            // 
+            // Only calculate precise values if we have a selected model
+            if (gameState.selectedModel !== null && gameState.models[gameState.selectedModel]) {
+                const model = gameState.models[gameState.selectedModel];
+                const threshold = gameState.thresholdValue;
                 
-                // Enhanced model quality factors with increased medium and large model benefits
-                const sizeFactor = { small: 0.5, medium: 0.92, large: 1.0 }[modelSize];
+                // Calculate expected FPR and FNR based on threshold
+                // Higher threshold → lower TPR (more FN), lower FPR (fewer FP)
+                // Lower threshold → higher TPR (fewer FN), higher FPR (more FP)
                 
-                // Enhanced data impact - more data gives better results now
-                const dataFactor = Math.min(1.0, (diseasedCount + healthyCount) / 400);
+                // Base FPR and FNR from model characteristics
+                const baseFPR = 1 - model.specificity;
+                const baseFNR = 1 - model.sensitivity;
                 
-                // Additional bonus for diseased images which are more valuable for learning
-                const diseasedBonus = Math.min(0.15, diseasedCount / 1000);
+                // Threshold adjustment factor (between -0.8 and 0.8 for threshold 0.1 to 0.9)
+                const thresholdFactor = 2 * (threshold - 0.5);
                 
-                const epochFactor = Math.min(1.0, epochs / 80) * (1 - Math.max(0, (epochs - 80) / 100)); // Peaks at 30 epochs to simulate overfitting
-                const balanceFactor = 1 - 0.3 * Math.abs(0.5 - (diseasedCount / (diseasedCount + healthyCount)));
-                
-                // Calculate base accuracy (0.6 to 0.95 range) with enhanced factors
-                baseAccuracy = 0.6 + 0.35 * sizeFactor * dataFactor * epochFactor * balanceFactor + diseasedBonus;
-                baseAccuracy = Math.min(baseAccuracy, 0.95);
-
-
-
-                // Calculate sensitivity and specificity (true positive rate and true negative rate)
-                const sensitivity = baseAccuracy * (0.85 + Math.random() * 0.1);
-                const specificity = baseAccuracy * (0.85 + Math.random() * 0.1);
-                 
-                // Calculate overall accuracy 
-                accuracy = 0.2 * sensitivity + 0.8 * specificity;
-                //accuracy can be at most 97%
-                
-
-                console.log("Model performance calculation:", {
-                    baseAccuracy,
-                    sizeFactor,
-                    dataFactor,
-                    epochFactor,
-                    balanceFactor,
-                    baseAccuracy,
-                    sensitivity,
-                    specificity,
-                    accuracy
+                console.log("Threshold adjustment:", {
+                    threshold,
+                    thresholdFactor,
+                    baseFPR,
+                    baseFNR
                 });
                 
-                // Create new model object
-                const newModel = {
-                    size: modelSize,
-                    diseasedCount,
-                    healthyCount,
-                    epochs,
-                    split,
-                    cost: totalCost,
-                    accuracy,
-                    sensitivity,
-                    specificity
-                };
+                // Adjust rates based on threshold
+                // Higher threshold decreases FP but increases FN
+                let adjustedFPR = baseFPR * (1 - Math.max(0, thresholdFactor));
+                let adjustedFNR = baseFNR * (1 - Math.max(0, -thresholdFactor));
                 
-                // Add to models array
-                gameState.models.push(newModel);
+                // Ensure we stay within reasonable bounds (0-100%)
+                adjustedFPR = Math.min(Math.max(0, adjustedFPR), 1);
+                adjustedFNR = Math.min(Math.max(0, adjustedFNR), 1);
                 
-                // Update budget
-                gameState.budget -= totalCost;
+                // Convert to percentages for display
+                fpPercent = Math.round(adjustedFPR * 100);
+                fnPercent = Math.round(adjustedFNR * 100);
                 
-                // Update UI
-                updateBudgetDisplay();
-                updateModelsList();
-                
-                console.log("Model trained successfully:", newModel);
-                console.log("Updated game state:", {
-                    budget: gameState.budget,
-                    models: gameState.models.length
+                console.log("Calculated rates:", {
+                    adjustedFPR,
+                    adjustedFNR,
+                    fpPercent,
+                    fnPercent
                 });
+            } else {
+                // If no model selected, show estimated values based only on threshold
+                const threshold = gameState.thresholdValue;
                 
-                // Show success message with next steps (without cancel button)
-                showConfirmModal(
-                    "Model Trained Successfully", 
-                    `Your ${modelSize} model has been trained successfully! You can now either deploy this model to screen patients or train another model.`,
-                    () => {
-                        // Return to round start screen
-                        showScreen('roundStart');
-                    },
-                    false // Don't show cancel button
-                );
-
-        });
+                // Simple scaling: as threshold increases, FP decreases and FN increases
+                const thresholdScale = (threshold - 0.1) / 0.8; // Scale from 0 to 1
+                
+                fpPercent = Math.round(30 * (1 - thresholdScale));
+                fnPercent = Math.round(10 + (20 * thresholdScale));
+                
+                console.log("Estimated rates (no model):", {
+                    threshold,
+                    thresholdScale,
+                    fpPercent, 
+                    fnPercent
+                });
+            }
+            
+            // Update the preview bars if they exist
+            if (fpBar && fnBar && fpValueDisplay && fnValueDisplay) {
+                fpBar.style.width = fpPercent + '%';
+                fnBar.style.width = fnPercent + '%';
+                fpValueDisplay.textContent = fpPercent + '%';
+                fnValueDisplay.textContent = fnPercent + '%';
+            } else {
+                console.error("Could not find threshold preview elements");
+            }
+        }
 
         // Deploy button
         deployBtn.addEventListener('click', () => {
