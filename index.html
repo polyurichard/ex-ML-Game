@@ -1615,10 +1615,10 @@
                     </div>
                     
                     <h3>Adjust Decision Threshold</h3>
-                    <p>The decision threshold is the probability at which the model decides if a patient has a disease. <br/>
+                    <p>The decision threshold is the probability value at which the model determines whether a patient is classified as having a disease. In simpler terms, probability represents how confident the model is that a patient has the disease, expressed as a number between 0 and 1 (e.g., 0.8 means the model is 80% confident). <br/>
                         <ul>
-                            <li>Thresholds closer to 1 mean the model requires a higher probability to flag a patient as diseased, making it more strict and reducing false positives.</li>
-                            <li>Thresholds closer to 0 mean the model requires a lower probability to flag a patient as diseased, making it more lenient and increasing the detection of true positives.</li>
+                            <li>Thresholds closer to 1 mean the model requires a higher model confidence to flag a patient as diseased</li>
+                            <li>Thresholds closer to 0 mean the model requires a lower model confidence to flag a patient as diseased</li>
                         </ul>
                     </p>
                     <div class="slider-container">
@@ -3377,17 +3377,11 @@
                     historyHtml += `
                     <div class="card mb-2 p-3" style="border-left: 4px solid var(--primary);">
                         <h5 style="color: var(--primary); font-size: 1.3rem;">Model ${index + 1} (${modelSizeDisplay})</h5>
-                        <p><strong>Configuration:</strong></p>
                         <ul style="list-style-type: none; padding-left: 10px;">
                             <li>📊 <strong>Training Data:</strong> ${model.diseasedCount} diseased, ${model.healthyCount} healthy images</li>
                             <li>⚙️ <strong>Parameters:</strong> ${model.epochs} epochs, ${model.split * 100}% train split</li>
                             <li>💰 <strong>Training Cost:</strong> $${model.cost.toLocaleString()}</li>
-                        </ul>
-                        <p><strong>Performance:</strong></p>
-                        <ul style="list-style-type: none; padding-left: 10px;">
                             <li>🎯 <strong>Accuracy:</strong> ${formatPercent(model.accuracy)}</li>
-                            <li>✅ <strong>Sensitivity:</strong> ${formatPercent(model.sensitivity)}</li>
-                            <li>🛡️ <strong>Specificity:</strong> ${formatPercent(model.specificity)}</li>
                         </ul>
                     </div>
                     `;
@@ -3418,7 +3412,7 @@
                         </div>
                         
                         <div class="mt-3">
-                            <p><strong>Clinical Impact:</strong></p>
+                            <p><strong>Model Performance:</strong></p>
                             <ul style="list-style-type: none; padding-left: 10px;">
                                 <li>✅ <strong>True Positive:</strong> ${result.TP} Diseased patients correctly identified</li>
                                 <li>❌ <strong>False Negative:</strong> ${result.FN} Diseased patients missed</li>
@@ -3426,19 +3420,9 @@
                                 <li>👍 <strong>True Negative:</strong> ${result.TN} Patiently Accurately Determined as Healthy</li>
                             </ul>
                         </div>
-                        
+                                                
                         <div class="mt-3">
-                            <p><strong>Performance Metrics:</strong></p>
-                            <ul style="list-style-type: none; padding-left: 10px;">
-                                <li>📈 <strong>Disease Detection Rate:</strong> ${formatPercent(result.TPR)}</li>
-                                <li>📉 <strong>False Alarm Rate:</strong> ${formatPercent(result.FPR)}</li>
-                                <li>👥 <strong>Patients Screened:</strong> 100</li>
-                                <li>🔬 <strong>Disease Prevalence:</strong> 20%</</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <p><strong>Financial Impact:</strong></p>
+                            <p><strong>Impact:</strong></p>
                             <ul style="list-style-type: none; padding-left: 10px;">
                                 <li>💰 <strong>Treatment Value:</strong> $${result.profit.toLocaleString()} (${result.TP} × $2,000)</li>
                                 <li>💸 <strong>Specialist Costs:</strong> $${result.clinicianCost.toLocaleString()} (${result.TP + result.FP} × $300)</li>
