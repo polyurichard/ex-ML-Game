@@ -1330,7 +1330,7 @@
                 </div>
             </div>
             
-            <div class="card">
+            <div class="card content-container" id="training-form">
                 <h2>Configure Your Model</h2>
                 
                 <div class="form-group">
@@ -1519,6 +1519,11 @@
                     <button id="training-back-btn" class="btn btn-danger">Cancel</button>
                     <button id="train-btn" class="btn btn-primary">Train Model</button>
                 </div>
+            </div>
+            
+            <div id="training-loading-container" class="loading-container card" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Training Model...</h3>
             </div>
         </div>
 
@@ -2873,89 +2878,104 @@
                 return;
             }
             
-            try {
-                // Model Training calculation
-                // Enhanced model quality factors with increased medium and large model benefits
-                const sizeFactor = { small: 0.5, medium: 0.92, large: 1.0 }[modelSize];
-                
-                // Enhanced data impact - more data gives better results now
-                const dataFactor = Math.min(1.0, (diseasedCount + healthyCount) / 400);
-                
-                // Additional bonus for diseased images which are more valuable for learning
-                const diseasedBonus = Math.min(0.15, diseasedCount / 1000);
-                
-                const epochFactor = Math.min(1.0, epochs / 80) * (1 - Math.max(0, (epochs - 80) / 100)); // Peaks at 30 epochs to simulate overfitting
-                const balanceFactor = 1 - 0.3 * Math.abs(0.5 - (diseasedCount / (diseasedCount + healthyCount)));
-                
-                // Calculate base accuracy (0.6 to 0.95 range) with enhanced factors
-                let baseAccuracy = 0.6 + 0.35 * sizeFactor * dataFactor * epochFactor * balanceFactor + diseasedBonus;
-                baseAccuracy = Math.min(baseAccuracy, 0.95);
+            // Show loading animation
+            document.getElementById('training-form').style.display = 'none';
+            document.getElementById('training-loading-container').style.display = 'block';
+            
+            // Use setTimeout to simulate training process
+            setTimeout(() => {
+                try {
+                    // Model Training calculation
+                    // Enhanced model quality factors with increased medium and large model benefits
+                    const sizeFactor = { small: 0.5, medium: 0.92, large: 1.0 }[modelSize];
+                    
+                    // Enhanced data impact - more data gives better results now
+                    const dataFactor = Math.min(1.0, (diseasedCount + healthyCount) / 400);
+                    
+                    // Additional bonus for diseased images which are more valuable for learning
+                    const diseasedBonus = Math.min(0.15, diseasedCount / 1000);
+                    
+                    const epochFactor = Math.min(1.0, epochs / 80) * (1 - Math.max(0, (epochs - 80) / 100)); // Peaks at 30 epochs to simulate overfitting
+                    const balanceFactor = 1 - 0.3 * Math.abs(0.5 - (diseasedCount / (diseasedCount + healthyCount)));
+                    
+                    // Calculate base accuracy (0.6 to 0.95 range) with enhanced factors
+                    let baseAccuracy = 0.6 + 0.35 * sizeFactor * dataFactor * epochFactor * balanceFactor + diseasedBonus;
+                    baseAccuracy = Math.min(baseAccuracy, 0.95);
 
-                // Calculate sensitivity and specificity (true positive rate and true negative rate)
-                const sensitivity = baseAccuracy * (0.85 + Math.random() * 0.1);
-                const specificity = baseAccuracy * (0.85 + Math.random() * 0.1);
-                 
-                // Calculate overall accuracy 
-                const accuracy = 0.2 * sensitivity + 0.8 * specificity;
-                
-                console.log("Model performance calculation:", {
-                    baseAccuracy,
-                    sizeFactor,
-                    dataFactor,
-                    epochFactor,
-                    balanceFactor,
-                    sensitivity,
-                    specificity,
-                    accuracy
-                });
-                
-                // Create new model object
-                const newModel = {
-                    size: modelSize,
-                    diseasedCount,
-                    healthyCount,
-                    epochs,
-                    split,
-                    cost: totalCost,
-                    accuracy,
-                    sensitivity,
-                    specificity
-                };
-                
-                // Add to models array
-                gameState.models.push(newModel);
-                
-                // Update budget
-                gameState.budget -= totalCost;
-                
-                // Update UI
-                updateBudgetDisplay();
-                updateModelsList();
-                
-                console.log("Model trained successfully:", newModel);
-                console.log("Updated game state:", {
-                    budget: gameState.budget,
-                    models: gameState.models.length
-                });
-                
-                // Show success message with next steps (without cancel button)
-                showConfirmModal(
-                    "Model Trained Successfully", 
-                    `Your ${modelSize} model has been trained successfully! You can now either deploy this model to screen patients or train another model.`,
-                    () => {
-                        // Return to round start screen
-                        showScreen('roundStart');
-                    },
-                    false // Don't show cancel button
-                );
-            } catch (err) {
-                console.error("Error during model training:", err);
-                showConfirmModal(
-                    "Training Error",
-                    "An error occurred while training the model. Please try again.",
-                    () => {} // Empty function as we don't need any action on confirm
-                );
-            }
+                    // Calculate sensitivity and specificity (true positive rate and true negative rate)
+                    const sensitivity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                    const specificity = baseAccuracy * (0.85 + Math.random() * 0.1);
+                    
+                    // Calculate overall accuracy 
+                    const accuracy = 0.2 * sensitivity + 0.8 * specificity;
+                    
+                    console.log("Model performance calculation:", {
+                        baseAccuracy,
+                        sizeFactor,
+                        dataFactor,
+                        epochFactor,
+                        balanceFactor,
+                        sensitivity,
+                        specificity,
+                        accuracy
+                    });
+                    
+                    // Create new model object
+                    const newModel = {
+                        size: modelSize,
+                        diseasedCount,
+                        healthyCount,
+                        epochs,
+                        split,
+                        cost: totalCost,
+                        accuracy,
+                        sensitivity,
+                        specificity
+                    };
+                    
+                    // Add to models array
+                    gameState.models.push(newModel);
+                    
+                    // Update budget
+                    gameState.budget -= totalCost;
+                    
+                    // Update UI
+                    updateBudgetDisplay();
+                    updateModelsList();
+                    
+                    console.log("Model trained successfully:", newModel);
+                    console.log("Updated game state:", {
+                        budget: gameState.budget,
+                        models: gameState.models.length
+                    });
+                    
+                    // Hide loading container
+                    document.getElementById('training-loading-container').style.display = 'none';
+                    document.getElementById('training-form').style.display = 'block';
+                    
+                    // Show success message with next steps (without cancel button)
+                    showConfirmModal(
+                        "Model Trained Successfully", 
+                        `Your ${modelSize} model has been trained successfully! You can now either deploy this model to screen patients or train another model.`,
+                        () => {
+                            // Return to round start screen
+                            showScreen('roundStart');
+                        },
+                        false // Don't show cancel button
+                    );
+                } catch (err) {
+                    // Hide loading container in case of error
+                    document.getElementById('training-loading-container').style.display = 'none';
+                    document.getElementById('training-form').style.display = 'block';
+                    
+                    console.error("Error during model training:", err);
+                    showConfirmModal(
+                        "Training Error",
+                        "An error occurred while training the model. Please try again.",
+                        () => {} // Empty function as we don't need any action on confirm
+                    );
+                }
+            }, 2000); // 2 second delay to show the loading animation
         });
 
         deployModelBtn.addEventListener('click', () => {
