@@ -86,9 +86,11 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1040px; /* Slightly larger to accommodate content-container padding */
             margin: 0 auto;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .card {
@@ -425,6 +427,10 @@
 
         .screen {
             display: none;
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         #intro-screen {
@@ -1151,6 +1157,41 @@
             }
         }
 
+        /* Fix width consistency for all content - improve centering */
+        .content-container {
+            max-width: 1000px;
+            margin: 0 auto; /* This centers the container */
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%; /* Ensures it takes full width until max-width */
+        }
+
+        /* Ensure container itself is centered */
+        .container {
+            max-width: 1040px; /* Slightly larger to accommodate content-container padding */
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* Make sure screens don't add extra padding that affects centering */
+        .screen {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Adjust card styling to work well with content-container */
+        .content-container.card {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         /* Fix width consistency for all content by removing the specific width class and applying container styling consistently */
         .content-container {
             max-width: 1000px;
@@ -1657,7 +1698,7 @@
                 <span>Budget:</span> <span id="results-budget-display" class="budget-amount">$30,000</span>
             </div>
             
-            <div class="card">
+            <div class="card content-container">
                 <h2 class="text-center mb-4">Deployment Results</h2>
                 
                 <div class="explanation-container mb-4">
@@ -1822,7 +1863,7 @@
         </div>
 
         <!-- Final Screen -->
-        <div id="final-screen" class="screen">
+        <div id="final-screen" class="screen content-container">
             <div class="header-layout">
                 <div class="top-controls">
                     <button id="final-view-history-btn" class="btn btn-info btn-sm" style="margin-right: 10px;">View History</button>
@@ -1831,16 +1872,15 @@
                 <div class="budget-top-display">
                     <span>Budget:</span> <span id="final-budget-display" class="budget-amount">$0</span>
                 </div>
-                <div class="banner">
-                    <h2>Game Complete!</h2>
-                </div>
+
             </div>
             
-            <div id="final-result-banner" class="result-banner">
-                <h2 id="final-result-text">Game Complete!</h2>
-            </div>
+
             
             <div class="card content-container">
+                <div id="final-result-banner" class="result-banner">
+                    <h2 id="final-result-text">Game Complete!</h2>
+                </div>                
                 <h2 class="text-center mb-4">Final Results</h2>
                 
                 <div class="metric-container">
@@ -2014,9 +2054,11 @@
             screens[screenId].style.display = 'block';
             
             // Apply consistent width to all cards in each screen
-            const mainCards = screens[screenId].querySelectorAll('.card:not(.final-results-content):not(.content-container)');
+            const mainCards = screens[screenId].querySelectorAll('.card:not(.loading-container):not(.model-card)');
             mainCards.forEach(card => {
-                card.classList.add('content-container');
+                if (!card.classList.contains('content-container')) {
+                    card.classList.add('content-container');
+                }
             });
         }
 
@@ -2975,7 +3017,7 @@
                         () => {} // Empty function as we don't need any action on confirm
                     );
                 }
-            }, 2000); // 2 second delay to show the loading animation
+            }, 1000); // 1 second delay to show the loading animation
         });
 
         deployModelBtn.addEventListener('click', () => {
@@ -3453,7 +3495,6 @@
     </script>
 </body>
 </html>
-
 
 
 
